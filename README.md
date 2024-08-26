@@ -1,0 +1,1 @@
+http://localhost:8080/query-filtering-web-app/search?queryText=java&length=6&includeMetaData=true
