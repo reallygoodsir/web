@@ -1,70 +1,76 @@
 package org.query.servlets;
 
-import jdk.nashorn.internal.parser.JSONParser;
-import org.json.JSONObject;
-import org.query.dao.JacksonCreate;
-import org.query.model.JavaWord;
+import org.query.converter.ResponseConverter;
+import org.query.dao.FileDataDAO;
+import org.query.filter.WordsFilter;
+import org.query.model.FileMetaData;
+import org.query.model.QueryFilteringResponse;
+import org.query.validator.QueryFilteringRequestValidator;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FilteringServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String queryTextParameter = req.getParameter("queryText");
+        String lengthParameter = req.getParameter("length");
+        String includeMetaDataParameter = req.getParameter("includeMetaData");
+
+        QueryFilteringRequestValidator queryFilteringRequestValidator =
+                new QueryFilteringRequestValidator(queryTextParameter, lengthParameter, includeMetaDataParameter);
+
+        boolean isQueryTextValid = queryFilteringRequestValidator.validateQueryText();
+
+        if (!isQueryTextValid) {
+            PrintWriter writer = resp.getWriter();
+            writer.println("Query text must not be empty!");
+            resp.setStatus(400);
+            return;
+        }
+
+        boolean isLengthValid = queryFilteringRequestValidator.validateLength();
+        if (!isLengthValid) {
+            PrintWriter writer = resp.getWriter();
+            writer.println("Please check if length has correct value. Length must be a positive integer!");
+            resp.setStatus(400);
+            return;
+        }
+
+        boolean isIncludeMetaDataValid = queryFilteringRequestValidator.validateIncludeMetaData();
+        if (!isIncludeMetaDataValid) {
+            PrintWriter writer = resp.getWriter();
+            writer.println("Please check if includeMetaData has correct value. IncludeMetaData can be empty or have true or false value!");
+            resp.setStatus(400);
+            return;
+        }
+
+        int length = Integer.parseInt(lengthParameter);
+
+        QueryFilteringResponse queryFilteringResponse = new QueryFilteringResponse();
+
+        FileDataDAO fileDataDAO = new FileDataDAO();
+        List<String> allWords = fileDataDAO.readWords("data.txt");
+
+        WordsFilter wordsFilter = new WordsFilter();
+        List<String> filteredWords = wordsFilter.filter(allWords, queryTextParameter, length);
+
+        queryFilteringResponse.setText(filteredWords);
+
+        if ("true".equalsIgnoreCase(includeMetaDataParameter)) {
+            FileMetaData fileMetaData = fileDataDAO.readMetaData("data.txt");
+            queryFilteringResponse.setMetaData(fileMetaData);
+        }
+
+        ResponseConverter responseConverter = new ResponseConverter();
+        String json = responseConverter.convert(queryFilteringResponse);
+
         resp.setContentType("application/json");
-        String metadataParameter = req.getParameter("includeMetaData");
-        String queryParameter = req.getParameter("queryText");
-        int lengthParameter = Integer.parseInt(req.getParameter("length"));
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream inputStream = classloader.getResourceAsStream("data.txt");
-        Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-        String stringResult = s.hasNext() ? s.next() : "";
-        String[] tempArray = stringResult.split("\\s+");
-        List<String> list = new ArrayList<>(Arrays.asList(tempArray));
-        System.out.println(list);
-
-        List<JavaWord> wordList = new ArrayList<>();
-        for(int i = 0; i < list.size(); i++){
-            String line = list.get(i);
-            if(line.length() <= lengthParameter && line.contains(queryParameter)){
-                JavaWord javaWord = new JavaWord();
-                javaWord.setWord(line);
-                wordList.add(javaWord);
-            }
-        }
-        PrintWriter result = resp.getWriter();
-        JacksonCreate JsonResult = new JacksonCreate();
-        JsonResult.createStringVersion(wordList);
-        String printThis = JsonResult.createStringVersion(wordList);
-        result.println(printThis);
-
-        if(metadataParameter.equalsIgnoreCase("true")){
-            String filePath = "D:\\data\\Java\\projects\\query-filtering-web-app\\src\\main\\resources\\data.txt";
-            File file = new File(filePath);
-
-            JacksonCreate metadata = new JacksonCreate();
-            String fileName = file.getName();
-            String fileSize = String.valueOf((file.length() / 1024));
-            FileTime creationTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
-            String fileCreationDate = String.valueOf(creationTime);
-            String metadataString = metadata.createMetadata(fileName, fileSize, fileCreationDate);
-
-            result.println(metadataString);
-        }
+        resp.getOutputStream().print(json);
     }
 }
