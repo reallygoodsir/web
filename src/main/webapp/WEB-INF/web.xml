@@ -3,10 +3,10 @@
         "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    <display-name>Archetype Created Web Application</display-name>
+    <display-name>Cars Form Web Application</display-name>
     <servlet>
         <servlet-name>servlet-cars</servlet-name>
-        <servlet-class>org.cars.servlets.CarsServlet</servlet-class>
+        <servlet-class>org.cars.servlets.CarServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
