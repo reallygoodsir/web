@@ -13,4 +13,22 @@
         <servlet-name>servlet-cars</servlet-name>
         <url-pattern>/cars</url-pattern>
     </servlet-mapping>
+
+    <filter>
+        <filter-name>ValidateFilter</filter-name>
+        <filter-class>org.cars.filters.ValidateFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>LogFilter</filter-name>
+        <filter-class>org.cars.filters.LogFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ValidateFilter</filter-name>
+        <url-pattern>/cars</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>LogFilter</filter-name>
+        <url-pattern>/cars</url-pattern>
+    </filter-mapping>
+
 </web-app>
