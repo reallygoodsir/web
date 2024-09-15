@@ -14,6 +14,16 @@
         <url-pattern>/cars</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>error-handler-servlet</servlet-name>
+        <servlet-class>org.cars.servlets.ErrorHandlerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>error-handler-servlet</servlet-name>
+        <url-pattern>/error-handler</url-pattern>
+    </servlet-mapping>
+
     <filter>
         <filter-name>ValidateFilter</filter-name>
         <filter-class>org.cars.filters.ValidateFilter</filter-class>
@@ -30,5 +40,10 @@
         <filter-name>LogFilter</filter-name>
         <url-pattern>/cars</url-pattern>
     </filter-mapping>
+
+    <error-page>
+        <exception-type>java.lang.RuntimeException</exception-type >
+        <location>/error-handler</location>
+    </error-page>
 
 </web-app>

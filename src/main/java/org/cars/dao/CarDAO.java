@@ -30,6 +30,7 @@ public class CarDAO {
             preparedStatementCars.execute();
         } catch (Exception e) {
             connection.rollback();
+            throw new SQLException(e);
         } finally {
             connection.commit();
             connection.close();

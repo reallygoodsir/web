@@ -50,9 +50,7 @@ public class CarServlet extends HttpServlet {
         try {
             carDAO.save(car);
         } catch (Exception e) {
-            response.getWriter().println("Error to save the car");
-            response.setStatus(500);
-            return;
+            throw new RuntimeException("Error to save the car with id " + car.getCarId());
         }
 
         response.setContentType("text/html");
