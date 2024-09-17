@@ -29,6 +29,14 @@
         <servlet-name>page-redirect</servlet-name>
         <url-pattern>/page-redirect</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>forward-test</servlet-name>
+        <servlet-class>org.cars.servlets.ForwardServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>forward-test</servlet-name>
+        <url-pattern>/forward-test</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>servlet-cars</servlet-name>
