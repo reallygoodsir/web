@@ -13,6 +13,15 @@
         <servlet-class>org.cars.servlets.CarServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>file-upload</servlet-name>
+        <servlet-class>org.cars.servlets.FileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>file-upload</servlet-name>
+        <url-pattern>/file-upload</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>servlet-cars</servlet-name>
         <url-pattern>/cars</url-pattern>
