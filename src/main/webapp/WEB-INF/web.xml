@@ -21,6 +21,14 @@
         <servlet-name>file-upload</servlet-name>
         <url-pattern>/file-upload</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>page-redirect</servlet-name>
+        <servlet-class>org.cars.servlets.PageRedirectServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>page-redirect</servlet-name>
+        <url-pattern>/page-redirect</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>servlet-cars</servlet-name>
