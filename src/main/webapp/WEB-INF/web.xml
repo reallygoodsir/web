@@ -5,6 +5,10 @@
 <web-app>
     <display-name>Cars Form Web Application</display-name>
     <servlet>
+        <servlet-name>cars-in-session-servlet</servlet-name>
+        <servlet-class>org.cars.servlets.CarsSessionServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>servlet-cars</servlet-name>
         <servlet-class>org.cars.servlets.CarServlet</servlet-class>
     </servlet>
@@ -24,6 +28,12 @@
         <url-pattern>/error-handler</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>cars-in-session-servlet</servlet-name>
+        <url-pattern>/cars-in-session</url-pattern>
+    </servlet-mapping>
+
+
     <filter>
         <filter-name>ValidateFilter</filter-name>
         <filter-class>org.cars.filters.ValidateFilter</filter-class>
@@ -42,8 +52,12 @@
     </filter-mapping>
 
     <error-page>
-        <exception-type>java.lang.RuntimeException</exception-type >
+        <exception-type>java.lang.RuntimeException</exception-type>
         <location>/error-handler</location>
     </error-page>
+
+    <session-config>
+        <session-timeout>15</session-timeout>
+    </session-config>
 
 </web-app>

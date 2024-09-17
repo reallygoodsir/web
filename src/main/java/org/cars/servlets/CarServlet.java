@@ -1,15 +1,12 @@
 package org.cars.servlets;
 
-import org.cars.dao.CarDAO;
 import org.cars.model.Car;
 import org.cars.model.CarInfo;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CarServlet extends HttpServlet {
@@ -17,6 +14,12 @@ public class CarServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter writer = resp.getWriter();
         StringBuilder html = new StringBuilder();
+
+        Cookie cookie1 = new Cookie("my-key", "my-value");
+        Cookie cookie2 = new Cookie("my-test-key", "my-test-value");
+        resp.addCookie(cookie1);
+        resp.addCookie(cookie2);
+
 
         html.append("<h1>Add New Car</h1>\n" +
                 "<form method=\"POST\">\n" +
@@ -28,10 +31,11 @@ public class CarServlet extends HttpServlet {
                 "  <h3>Type:   <input type=\\\"text\\\" name=\"type\" <h3>" +
                 "</form>\n" +
                 "</br></br>" +
-                "<input type=\"submit\" value=\"Save\"/>" +
+                "<input type=\"submit\" value=\"Add\"/>" +
+                "</br></br>" +
+                "<a href=\"http://localhost:8080/cars-web-app-form/cars-in-session\">Show all cars in session</a> " +
                 "</div>");
         writer.println(html);
-
     }
 
     @Override
@@ -46,71 +50,16 @@ public class CarServlet extends HttpServlet {
         carInfo.setMake(request.getParameter("make"));
         car.setCarInfo(carInfo);
 
-        CarDAO carDAO = new CarDAO();
-        try {
-            carDAO.save(car);
-        } catch (Exception e) {
-            throw new RuntimeException("Error to save the car with id " + car.getCarId());
+        HttpSession session = request.getSession(true);
+
+        List<Car> cars = (List<Car>) session.getAttribute("cars");
+        if (cars == null) {
+            cars = new ArrayList<>();
+            session.setAttribute("cars", cars);
         }
+        cars.add(car);
 
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-
-        StringBuilder stringBuilder = new StringBuilder(" ");
-        String HTML = "<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<style>\n" +
-                "table, th, td {\n" +
-                "  border:1px solid black;\n" +
-                "}\n" +
-                "</style>\n" +
-                "<body>\n" +
-                "\n" +
-
-                "<h1>CARS</h1>" +
-                "<table style=\"width:100%\">" +
-                "<tr>" +
-                "<th>" + "CAR ID" + "</th>" +
-                "<th>" + "CAR NAME" + "</th>" +
-                "<th>" + "CAR PRICE" + "</th>" +
-                "<th>" + "CAR TYPE" + "</th>" +
-                "<th>" + "CAR MAKE" + "</th>" +
-                "<th>" + "CAR MODEL" + "</th>" +
-                "</tr>";
-        stringBuilder.append(HTML);
-
-        List<Car> allCars;
-        try {
-            allCars = carDAO.readAll();
-        } catch (SQLException e) {
-            response.getWriter().println("Error to get list of cars");
-            response.setStatus(500);
-            return;
-        }
-
-        for (int i = 0; i < allCars.size(); i++) {
-            Car printCar = allCars.get(i);
-            CarInfo printCarInfo = printCar.getCarInfo();
-            Integer id = printCar.getCarId();
-            String carName = printCarInfo.getName();
-            Integer carPrice = printCar.getCarPrice();
-            String carType = printCar.getCarType();
-            String carMake = printCarInfo.getMake();
-            String carModel = printCarInfo.getModel();
-            stringBuilder.append("</tr>" +
-                    "<tr>" +
-                    "<td>" + id + "</td>" +
-                    "<td>" + carName + "</td>" +
-                    "<td>" + carPrice + "</td>" +
-                    "<td>" + carType + "</td>" +
-                    "<td>" + carMake + "</td>" +
-                    "<td>" + carModel + "</td>" +
-                    "</tr>"
-            );
-        }
-        stringBuilder.append("</table>" +
-                "</body>\n" +
-                "</html>");
-        out.println(stringBuilder);
+        doGet(request, response);
     }
 }
