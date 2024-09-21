@@ -24,6 +24,10 @@
     <servlet>
         <servlet-name>page-redirect</servlet-name>
         <servlet-class>org.cars.servlets.PageRedirectServlet</servlet-class>
+        <init-param>
+            <param-name>football-redirect-url</param-name>
+            <param-value>https://football.ua/</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>page-redirect</servlet-name>
