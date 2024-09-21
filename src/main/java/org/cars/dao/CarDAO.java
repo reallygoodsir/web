@@ -9,14 +9,22 @@ import java.util.Collections;
 import java.util.List;
 
 public class CarDAO {
-    private static final String DB_URL = "jdbc:mysql://localhost/car_db";
-    private static final String USER = "root";
-    private static final String PASS = "root";
+
+    private String dbUrl;
+    private String dbUserName;
+    private String dbPassword;
+
+    public CarDAO(String dbUrl, String dbUserName, String dbPassword) {
+        this.dbUrl = dbUrl;
+        this.dbUserName = dbUserName;
+        this.dbPassword = dbPassword;
+    }
+
     private static final String QUERY_ADD_CARS = "INSERT INTO cars VALUES (?, ?, ?, ?, ?, ?)";
     private static final String QUERY_READ_ALL = "SELECT * FROM cars";
 
     public void save(Car car) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
         try {
             PreparedStatement preparedStatementCars = connection.prepareStatement(QUERY_ADD_CARS);
             connection.setAutoCommit(false);
@@ -38,7 +46,7 @@ public class CarDAO {
     }
 
     public List<Car> readAll() throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        Connection connection = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
         try {
             PreparedStatement preparedStatementPlanes = connection.prepareStatement(QUERY_READ_ALL);
             ResultSet rs = preparedStatementPlanes.executeQuery();

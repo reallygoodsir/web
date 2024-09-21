@@ -4,6 +4,7 @@ import org.cars.dao.CarDAO;
 import org.cars.model.Car;
 import org.cars.model.CarInfo;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,35 +44,36 @@ public class CarsSessionServlet extends HttpServlet {
                 "</tr>";
         stringBuilder.append(HTML);
         List<Car> allCars = (List<Car>) session.getAttribute("cars");
-
-        for (int i = 0; i < allCars.size(); i++) {
-            Car printCar = allCars.get(i);
-            CarInfo printCarInfo = printCar.getCarInfo();
-            Integer id = printCar.getCarId();
-            String carName = printCarInfo.getName();
-            Integer carPrice = printCar.getCarPrice();
-            String carType = printCar.getCarType();
-            String carMake = printCarInfo.getMake();
-            String carModel = printCarInfo.getModel();
-            stringBuilder.append("</tr>" +
-                    "<tr>" +
-                    "<td>" + id + "</td>" +
-                    "<td>" + carName + "</td>" +
-                    "<td>" + carPrice + "</td>" +
-                    "<td>" + carType + "</td>" +
-                    "<td>" + carMake + "</td>" +
-                    "<td>" + carModel + "</td>" +
-                    "</tr>"
-            );
+        if(allCars != null) {
+            for (int i = 0; i < allCars.size(); i++) {
+                Car printCar = allCars.get(i);
+                CarInfo printCarInfo = printCar.getCarInfo();
+                Integer id = printCar.getCarId();
+                String carName = printCarInfo.getName();
+                Integer carPrice = printCar.getCarPrice();
+                String carType = printCar.getCarType();
+                String carMake = printCarInfo.getMake();
+                String carModel = printCarInfo.getModel();
+                stringBuilder.append("</tr>" +
+                        "<tr>" +
+                        "<td>" + id + "</td>" +
+                        "<td>" + carName + "</td>" +
+                        "<td>" + carPrice + "</td>" +
+                        "<td>" + carType + "</td>" +
+                        "<td>" + carMake + "</td>" +
+                        "<td>" + carModel + "</td>" +
+                        "</tr>"
+                );
+            }
+            stringBuilder.append("</table>" +
+                    "</body>\n" +
+                    "</html>");
+            stringBuilder.append("<form method=\"POST\">\n" +
+                    "<input type=\"submit\" value=\"Save to Database\">\n" +
+                    "</form>");
+            stringBuilder.append("<a href=\"http://localhost:8080/cars-web-app-form/cars\">Return to the main page</a> " +
+                    "</div>");
         }
-        stringBuilder.append("</table>" +
-                "</body>\n" +
-                "</html>");
-        stringBuilder.append("<form method=\"POST\">\n" +
-                "<input type=\"submit\" value=\"Save to Database\">\n" +
-                "</form>");
-        stringBuilder.append("<a href=\"http://localhost:8080/cars-web-app-form/cars\">Return to the main page</a> " +
-                "</div>");
         out.println(stringBuilder);
         System.out.println("End CarsSessionServlet doGet");
     }
@@ -79,7 +81,16 @@ public class CarsSessionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws IOException {
         HttpSession session = request.getSession(true);
-        CarDAO carDAO = new CarDAO();
+
+        ServletContext servletContext = getServletContext();
+        String dbUrl = servletContext.getInitParameter("DB_URL");
+        String dbUserName = servletContext.getInitParameter("DB_USER_NAME");
+        String dbUserPassword = servletContext.getInitParameter("DB_USER_PASSWORD");
+        System.out.println("dbUrl: " + dbUrl);
+        System.out.println("dbUserName: " + dbUserName);
+        System.out.println("dbUserPassword: " + dbUserPassword);
+
+        CarDAO carDAO = new CarDAO(dbUrl, dbUserName, dbUserPassword);
         List<Car> allCars = (List<Car>) session.getAttribute("cars");
         for (Car car : allCars) {
             try {
