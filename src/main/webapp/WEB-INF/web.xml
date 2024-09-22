@@ -108,4 +108,17 @@
         <param-value>root</param-value>
     </context-param>
 
+    <listener>
+        <listener-class>org.cars.listeners.CarsHttpSessionAttributeListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.cars.listeners.CarsServletRequestListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.cars.listeners.CarsHttpSessionListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.cars.listeners.ApplicationServletContextListener</listener-class>
+    </listener>
+
 </web-app>
