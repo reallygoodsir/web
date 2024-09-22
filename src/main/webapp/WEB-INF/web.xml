@@ -16,6 +16,10 @@
     <servlet>
         <servlet-name>file-upload</servlet-name>
         <servlet-class>org.cars.servlets.FileServlet</servlet-class>
+        <init-param>
+            <param-name>file-path</param-name>
+            <param-value>d:\data\Java\apache-tomcat-9.0.93\files\</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>file-upload</servlet-name>

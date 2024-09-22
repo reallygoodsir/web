@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class FileServlet extends HttpServlet {
     private boolean isMultipart;
-    private String filePath = "d:\\data\\Java\\apache-tomcat-9.0.93\\files\\";
+    private String filePath;
     private int maxFileSize = 50 * 1024;
     private int maxMemSize = 4 * 1024;
     private File file ;
@@ -44,6 +45,8 @@ public class FileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         isMultipart = ServletFileUpload.isMultipartContent(request);
+        ServletConfig servletConfig = getServletConfig();
+        filePath = servletConfig.getInitParameter("file-path");
         response.setContentType("text/html");
         java.io.PrintWriter out = response.getWriter( );
 
