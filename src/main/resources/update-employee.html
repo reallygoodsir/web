@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Update Employee</title>
+</head>
+<body>
+
+<h1>Update Employee</h1>
+<form action="http://localhost:8080/employees-web-app/update" method="post">
+    <table>
+        <tr>
+            <td></td>
+            <td><input type='hidden' name='id' value='id_value_replace'/></td>
+        </tr>
+        <tr>
+            <td>Name:</td>
+            <td><input type='text' name='name' value='name_value_replace'/></td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td><input type='password' name='password' value='password_value_replace'/></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type='email' name='email' value='email_value_replace'/></td>
+        </tr>
+        <tr>
+            <td>Country:</td>
+            <td><select name='country' style='width:150px'>
+                <option>India</option>
+                <option>USA</option>
+                <option>UK</option>
+                <option>Other</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td colspan='2'><input type='submit' value='Edit & Save '/></td>
+        </tr>
+    </table>
+</form>
+
+<br/>
+<a href="view">view employees</a>
+
+</body>
+
+</html>
