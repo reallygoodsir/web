@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <servlet>
+        <servlet-name>download-file-servlet</servlet-name>
+        <servlet-class>file.management.servlets.DownloadFileServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>download-file-servlet</servlet-name>
+        <url-pattern>/download-file</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>download-pdf-servlet</servlet-name>
+        <servlet-class>file.management.servlets.DownloadPDFServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>download-pdf-servlet</servlet-name>
+        <url-pattern>/download-pdf</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>download-image-servlet</servlet-name>
+        <servlet-class>file.management.servlets.DownloadImageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>download-image-servlet</servlet-name>
+        <url-pattern>/download-image</url-pattern>
+    </servlet-mapping>
+</web-app>
