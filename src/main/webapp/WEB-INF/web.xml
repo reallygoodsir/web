@@ -1,0 +1,44 @@
+<web-app>
+    <display-name>Internationalisation</display-name>
+    <servlet>
+        <servlet-name>display-language-servlet</servlet-name>
+        <servlet-class>i18n.web.app.DisplaySpanish</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>display-language-servlet</servlet-name>
+        <url-pattern>/languages</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>currency-locale-servlet</servlet-name>
+        <servlet-class>i18n.web.app.CurrencyLocale</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>currency-locale-servlet</servlet-name>
+        <url-pattern>/currency</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>date-locale-servlet</servlet-name>
+        <servlet-class>i18n.web.app.DateLocale</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>date-locale-servlet</servlet-name>
+        <url-pattern>/date</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>percentage-locale-servlet</servlet-name>
+        <servlet-class>i18n.web.app.PercentageLocale</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>currency-locale-servlet</servlet-name>
+        <url-pattern>/percentage</url-pattern>
+    </servlet-mapping>
+
+
+    <welcome-file-list>
+        <welcome-file>languages</welcome-file>
+    </welcome-file-list>
+</web-app>
