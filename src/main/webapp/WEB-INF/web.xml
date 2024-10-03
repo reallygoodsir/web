@@ -1,0 +1,16 @@
+
+<web-app>
+    <display-name>Threads Web Application</display-name>
+    <servlet>
+        <servlet-name>thread-servlet</servlet-name>
+        <servlet-class>threads.web.app.MyServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>thread-servlet</servlet-name>
+        <url-pattern>/threads</url-pattern>
+    </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>threads</welcome-file>
+    </welcome-file-list>
+</web-app>
