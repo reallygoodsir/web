@@ -2,13 +2,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.web.app</groupId>
-    <artifactId>my-web-app</artifactId>
+    <artifactId>servlet-annotations</artifactId>
     <packaging>war</packaging>
     <version>1.0.0</version>
-    <name>My Meb App</name>
+    <name>servlet-annotations</name>
     <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
-        <finalName>my-web-app</finalName>
+        <finalName>servlet-annotations</finalName>
     </build>
 </project>
