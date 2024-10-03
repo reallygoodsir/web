@@ -6,6 +6,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,12 +17,16 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
+@WebServlet(value = "/file-upload", initParams = {
+        @WebInitParam(name = "file-path", value = "d:\\data\\Java\\apache-tomcat-9.0.93\\files\\")
+})
+
 public class FileServlet extends HttpServlet {
     private boolean isMultipart;
     private String filePath;
     private int maxFileSize = 50 * 1024;
     private int maxMemSize = 4 * 1024;
-    private File file ;
+    private File file;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -48,9 +54,9 @@ public class FileServlet extends HttpServlet {
         ServletConfig servletConfig = getServletConfig();
         filePath = servletConfig.getInitParameter("file-path");
         response.setContentType("text/html");
-        java.io.PrintWriter out = response.getWriter( );
+        java.io.PrintWriter out = response.getWriter();
 
-        if( !isMultipart ) {
+        if (!isMultipart) {
             out.println("<html>");
             out.println("<head>");
             out.println("<title>Servlet upload</title>");
@@ -74,7 +80,7 @@ public class FileServlet extends HttpServlet {
         ServletFileUpload upload = new ServletFileUpload(factory);
 
         // maximum file size to be uploaded.
-        upload.setSizeMax( maxFileSize );
+        upload.setSizeMax(maxFileSize);
 
         try {
             // Parse the request to get file items.
@@ -89,9 +95,9 @@ public class FileServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
 
-            while ( i.hasNext () ) {
-                FileItem fi = (FileItem)i.next();
-                if ( !fi.isFormField () ) {
+            while (i.hasNext()) {
+                FileItem fi = (FileItem) i.next();
+                if (!fi.isFormField()) {
                     // Get the uploaded file parameters
                     String fieldName = fi.getFieldName();
                     String fileName = fi.getName();
@@ -100,19 +106,19 @@ public class FileServlet extends HttpServlet {
                     long sizeInBytes = fi.getSize();
 
                     // Write the file
-                    if( fileName.lastIndexOf("\\") >= 0 ) {
-                        file = new File( filePath + fileName.substring( fileName.lastIndexOf("\\"))) ;
+                    if (fileName.lastIndexOf("\\") >= 0) {
+                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\")));
                     } else {
-                        file = new File( filePath + fileName.substring(fileName.lastIndexOf("\\")+1)) ;
+                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
                     }
                     System.out.println("AbsolutePath " + file.getAbsolutePath());
-                    fi.write( file ) ;
+                    fi.write(file);
                     out.println("Uploaded Filename: " + fileName + "<br>");
                 }
             }
             out.println("</body>");
             out.println("</html>");
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex);
         }
     }

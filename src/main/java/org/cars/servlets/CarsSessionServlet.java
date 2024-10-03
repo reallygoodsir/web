@@ -5,6 +5,7 @@ import org.cars.model.Car;
 import org.cars.model.CarInfo;
 
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-
+@WebServlet(value = "/cars-in-session")
 public class CarsSessionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -71,7 +72,7 @@ public class CarsSessionServlet extends HttpServlet {
             stringBuilder.append("<form method=\"POST\">\n" +
                     "<input type=\"submit\" value=\"Save to Database\">\n" +
                     "</form>");
-            stringBuilder.append("<a href=\"http://localhost:8080/cars-web-app-form/cars\">Return to the main page</a> " +
+            stringBuilder.append("<a href=\"http://localhost:8080/cars-web-app-form-with-annotations/cars\">Return to the main page</a> " +
                     "</div>");
         }
         out.println(stringBuilder);

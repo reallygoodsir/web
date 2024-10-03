@@ -1,9 +1,11 @@
 package org.cars.filters;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+@WebFilter(urlPatterns = "/cars")
 
 public class ValidateFilter implements Filter {
     @Override

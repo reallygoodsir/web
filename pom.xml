@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.example</groupId>
-    <artifactId>cars-web-app-form</artifactId>
+    <artifactId>cars-web-app-form-with-annotations</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Cars Web App Form</name>
@@ -10,8 +10,8 @@
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -28,6 +28,6 @@
 
     </dependencies>
     <build>
-        <finalName>cars-web-app-form</finalName>
+        <finalName>cars-web-app-form-with-annotations</finalName>
     </build>
 </project>

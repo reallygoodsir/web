@@ -3,12 +3,13 @@ package org.cars.servlets;
 import org.cars.model.Car;
 import org.cars.model.CarInfo;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
+@WebServlet(value = "/cars")
 public class CarServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -33,7 +34,7 @@ public class CarServlet extends HttpServlet {
                 "</br></br>" +
                 "<input type=\"submit\" value=\"Add\"/>" +
                 "</br></br>" +
-                "<a href=\"http://localhost:8080/cars-web-app-form/cars-in-session\">Show all cars in session</a> " +
+                "<a href=\"http://localhost:8080/cars-web-app-form-with-annotations/cars-in-session\">Show all cars in session</a> " +
                 "</div>");
         writer.println(html);
     }

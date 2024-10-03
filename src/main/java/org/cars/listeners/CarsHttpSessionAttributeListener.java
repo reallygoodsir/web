@@ -1,8 +1,10 @@
 package org.cars.listeners;
 
+import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 
+@WebListener
 public class CarsHttpSessionAttributeListener implements HttpSessionAttributeListener {
     @Override
     public void attributeAdded(HttpSessionBindingEvent httpSessionBindingEvent) {

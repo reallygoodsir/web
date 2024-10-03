@@ -4,86 +4,6 @@
 
 <web-app>
     <display-name>Cars Form Web Application</display-name>
-    <servlet>
-        <servlet-name>cars-in-session-servlet</servlet-name>
-        <servlet-class>org.cars.servlets.CarsSessionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>servlet-cars</servlet-name>
-        <servlet-class>org.cars.servlets.CarServlet</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>file-upload</servlet-name>
-        <servlet-class>org.cars.servlets.FileServlet</servlet-class>
-        <init-param>
-            <param-name>file-path</param-name>
-            <param-value>d:\data\Java\apache-tomcat-9.0.93\files\</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>file-upload</servlet-name>
-        <url-pattern>/file-upload</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>page-redirect</servlet-name>
-        <servlet-class>org.cars.servlets.PageRedirectServlet</servlet-class>
-        <init-param>
-            <param-name>football-redirect-url</param-name>
-            <param-value>https://football.ua/</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>page-redirect</servlet-name>
-        <url-pattern>/page-redirect</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>forward-test</servlet-name>
-        <servlet-class>org.cars.servlets.ForwardServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>forward-test</servlet-name>
-        <url-pattern>/forward-test</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>servlet-cars</servlet-name>
-        <url-pattern>/cars</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>error-handler-servlet</servlet-name>
-        <servlet-class>org.cars.servlets.ErrorHandlerServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>error-handler-servlet</servlet-name>
-        <url-pattern>/error-handler</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>cars-in-session-servlet</servlet-name>
-        <url-pattern>/cars-in-session</url-pattern>
-    </servlet-mapping>
-
-
-    <filter>
-        <filter-name>ValidateFilter</filter-name>
-        <filter-class>org.cars.filters.ValidateFilter</filter-class>
-    </filter>
-    <filter>
-        <filter-name>LogFilter</filter-name>
-        <filter-class>org.cars.filters.LogFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>ValidateFilter</filter-name>
-        <url-pattern>/cars</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>LogFilter</filter-name>
-        <url-pattern>/cars</url-pattern>
-    </filter-mapping>
-
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
         <location>/error-handler</location>
@@ -107,18 +27,4 @@
         <param-name>DB_USER_PASSWORD</param-name>
         <param-value>root</param-value>
     </context-param>
-
-    <listener>
-        <listener-class>org.cars.listeners.CarsHttpSessionAttributeListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>org.cars.listeners.CarsServletRequestListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>org.cars.listeners.CarsHttpSessionListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>org.cars.listeners.ApplicationServletContextListener</listener-class>
-    </listener>
-
 </web-app>
