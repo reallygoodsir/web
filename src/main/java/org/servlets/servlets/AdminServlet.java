@@ -226,7 +226,8 @@ public class AdminServlet extends HttpServlet {
                 answers.add(firstAnswer);
                 answers.add(secondAnswer);
                 answers.add(thirdAnswer);
-                Question question = new Question(req.getParameter("question"), answers);
+                Question question = new Question(req.getParameter("question"));
+                question.setAnswers(answers);
 
                 QuestionsDAO questionsDAO = new QuestionsDAO();
                 questionsDAO.saveQuestion(question);

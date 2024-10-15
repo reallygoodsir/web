@@ -7,9 +7,8 @@ public class Question {
     private String name;
     private List<Answer> answers;
 
-    public Question(String name, List<Answer> answers) {
+    public Question(String name) {
         this.name = name;
-        this.answers = answers;
     }
 
     public Integer getId() {

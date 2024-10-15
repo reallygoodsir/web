@@ -13,4 +13,23 @@
     <servlet-name>admin-servlet</servlet-name>
     <url-pattern>/admin</url-pattern>
   </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>quiz-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.QuizServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>quiz-servlet</servlet-name>
+    <url-pattern>/quiz</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>results-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.ResultsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>results-servlet</servlet-name>
+    <url-pattern>/results</url-pattern>
+  </servlet-mapping>
 </web-app>
