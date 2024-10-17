@@ -1,7 +1,6 @@
 package org.servlets.servlets;
 
-import com.mysql.cj.Session;
-import org.servlets.dao.QuizDAO;
+import org.servlets.dao.QuestionsDAO;
 import org.servlets.dao.QuizDisplayDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
@@ -22,9 +21,9 @@ public class QuizServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(true);
         PrintWriter writer = resp.getWriter();
-        QuizDAO quizDAO = new QuizDAO();
+        QuestionsDAO questionsDAO = new QuestionsDAO();
         try {
-            List<Question> questions = quizDAO.getQuestions();
+            List<Question> questions = questionsDAO.getQuestions();
 
             String page = req.getParameter("page");
             if (page == null) {

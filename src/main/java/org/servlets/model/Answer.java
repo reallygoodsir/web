@@ -6,7 +6,16 @@ public class Answer {
     private String isCorrect;
     private Integer questionId;
 
+    public Answer() {
+    }
+
     public Answer(String name, String isCorrect) {
+        this.name = name;
+        this.isCorrect = isCorrect;
+    }
+
+    public Answer(Integer id, String name, String isCorrect) {
+        this.id = id;
         this.name = name;
         this.isCorrect = isCorrect;
     }

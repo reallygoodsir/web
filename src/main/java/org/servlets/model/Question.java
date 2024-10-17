@@ -7,8 +7,17 @@ public class Question {
     private String name;
     private List<Answer> answers;
 
+    public Question() {
+    }
+
     public Question(String name) {
         this.name = name;
+    }
+
+    public Question(Integer id, String name, List<Answer> answers) {
+        this.id = id;
+        this.name = name;
+        this.answers = answers;
     }
 
     public Integer getId() {
