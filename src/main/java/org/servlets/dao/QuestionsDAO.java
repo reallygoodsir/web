@@ -99,7 +99,6 @@ public class QuestionsDAO extends BaseDAO {
         } catch (Exception e) {
             System.out.println("Error fetching questions: " + e.getMessage());
         }
-
         return result;
     }
 }
