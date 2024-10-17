@@ -5,7 +5,9 @@ import org.servlets.model.Question;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QuestionsDAO extends BaseDAO {
     private static final String INSERT_ANSWER = "INSERT INTO answers (name, is_correct, question_id) VALUES (?, ?, ?)";
@@ -62,11 +64,13 @@ public class QuestionsDAO extends BaseDAO {
 
     public List<Question> getQuestions() throws SQLException {
         List<Question> result = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
-            PreparedStatement statementGetQuestions = connection.prepareStatement(GET_QUESTIONS_AND_ANSWERS);
-            ResultSet resultSet = statementGetQuestions.executeQuery();
 
-            Question previousQuestion = null;
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
+             PreparedStatement statementGetQuestions = connection.prepareStatement(GET_QUESTIONS_AND_ANSWERS);
+             ResultSet resultSet = statementGetQuestions.executeQuery()) {
+
+            Map<Integer, Question> questionMap = new HashMap<>();
+
             while (resultSet.next()) {
                 int questionId = resultSet.getInt("question_id");
                 String questionName = resultSet.getString("question_name");
@@ -74,41 +78,28 @@ public class QuestionsDAO extends BaseDAO {
                 String answerName = resultSet.getString("answer_name");
                 String answerIsCorrect = resultSet.getString("answer_is_correct");
 
-                System.out.println("questionId " + questionId);
-                System.out.println("questionName " + questionName);
-                System.out.println("answerId " + answerId);
-                System.out.println("answerName " + answerName);
-                System.out.println("answerIsCorrect " + answerIsCorrect);
-
-                if (previousQuestion == null || !previousQuestion.getId().equals(questionId)) {
-                    Question question = new Question();
+                Question question = questionMap.get(questionId);
+                if (question == null) {
+                    question = new Question();
                     question.setId(questionId);
                     question.setName(questionName);
-
-                    Answer answer = new Answer();
-                    answer.setId(answerId);
-                    answer.setName(answerName);
-                    answer.setIsCorrect(answerIsCorrect);
-
-                    List<Answer> answers = new ArrayList<>();
-                    answers.add(answer);
-
-                    question.setAnswers(answers);
-
+                    question.setAnswers(new ArrayList<Answer>());
+                    questionMap.put(questionId, question);
                     result.add(question);
-                    previousQuestion = question;
-                } else {
-                    List<Answer> answers = previousQuestion.getAnswers();
-                    Answer answer = new Answer();
-                    answer.setId(answerId);
-                    answer.setName(answerName);
-                    answer.setIsCorrect(answerIsCorrect);
-                    answers.add(answer);
                 }
+
+                // Create a new answer and add it to the question's list of answers
+                Answer answer = new Answer();
+                answer.setId(answerId);
+                answer.setName(answerName);
+                answer.setIsCorrect(answerIsCorrect);
+                List<Answer> answers = question.getAnswers();
+                answers.add(answer);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error fetching questions: " + e.getMessage());
         }
+
         return result;
     }
 }
