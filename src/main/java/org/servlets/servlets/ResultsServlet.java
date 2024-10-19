@@ -30,7 +30,7 @@ public class ResultsServlet extends HttpServlet {
                     "<head>\n" +
                     "    <meta charset=\"UTF-8\">\n" +
                     "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                    "    <title>Static Label Page</title>\n" +
+                    "    <title>Quiz Results</title>\n" +
                     "    <style>\n" +
                     "        body {\n" +
                     "            background: #f0f2f5;\n" +
@@ -66,7 +66,7 @@ public class ResultsServlet extends HttpServlet {
                     "</head>\n" +
                     "<body>\n" +
                     "    <div class=\"container\">\n" +
-                    "        <div class=\"static-label\">Your score is " + finalScore + ".</div>\n" +
+                    "        <div class=\"static-label\">Your score is " + finalScore + "/" + attributeScoreList.size() + "</div>\n" +
                     "    </div>\n" +
                     "</body>\n" +
                     "</html>");

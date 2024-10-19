@@ -38,14 +38,24 @@ public class QuizServlet extends HttpServlet {
                 session.setAttribute("correctIds", correctIds);
                 session.setAttribute("score", 0);
 
-                // populate score list with default ( incorrect ) zero values
+                // populate score list with default ( incorrect ) negative one values
                 List<Integer> scoreList = new ArrayList<>();
                 for (int i = 0; i < questions.size(); i++) {
-                    scoreList.add(0);
+                    scoreList.add(-1);
+                }
+                List<Integer> checkedList = new ArrayList<>();
+                for (int i = 0; i < questions.size(); i++) {
+                    checkedList.add(-1);
                 }
                 session.setAttribute("scoreList", scoreList);
+                session.setAttribute("checkedList", checkedList);
             }
             List<Question> questions = (List<Question>) session.getAttribute("questions");
+            Object objectScoreList = session.getAttribute("scoreList");
+            List<Integer> scoreList = (ArrayList<Integer>) objectScoreList;
+
+            Object objectCheckedList = session.getAttribute("checkedList");
+            List<Integer> checkedList = (ArrayList<Integer>) objectCheckedList;
 
             String page = req.getParameter("page");
             if (page == null) {
@@ -66,13 +76,15 @@ public class QuizServlet extends HttpServlet {
                 userAnswerExists = false;
             }
 
+            Integer userScore = scoreList.get(currentPage - 1);
+
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
                     "    <meta charset=\"UTF-8\">\n" +
                     "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                    "    <title>Select an Option</title>\n" +
+                    "    <title>Servlet Quiz</title>\n" +
                     "    <style>\n" +
                     "        body {\n" +
                     "            background: #f0f2f5;\n" +
@@ -91,20 +103,32 @@ public class QuizServlet extends HttpServlet {
                     "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
                     "            width: 100%;\n" +
                     "            max-width: 400px;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .form-container .static-label {\n" +
-                    "            text-align: center;\n" +
-                    "            font-size: 18px;\n" +
-                    "            font-weight: bold;\n" +
-                    "            color: #333;\n" +
-                    "            background-color: #e8f5e9;\n" +
-                    "            padding: 10px;\n" +
-                    "            border-radius: 5px;\n" +
-                    "            border: 2px solid #4CAF50;\n" +
-                    "            margin-bottom: 20px;\n" +
-                    "        }\n" +
-                    "\n" +
+                    "        }\n");
+            if ("Correct".equalsIgnoreCase(userAnswer) || userScore == 1) {
+                html.append(".form-container .static-label {\n" +
+                        "    text-align: center;\n" +
+                        "    font-size: 18px;\n" +
+                        "    font-weight: bold;\n" +
+                        "    color: #333;\n" +
+                        "    background-color: #e8f5e9;\n" +
+                        "    padding: 10px;\n" +
+                        "    border-radius: 5px;\n" +
+                        "    border: 2px solid #4CAF50;\n" +
+                        "    margin-bottom: 20px;\n}");
+            } else {
+                html.append(".form-container .static-label {\n" +
+                        "    text-align: center;\n" +
+                        "            font-size: 18px;\n" +
+                        "            font-weight: bold;\n" +
+                        "            color: #721c24;\n" +
+                        "            background-color: #f8d7da;\n" +
+                        "            padding: 10px;\n" +
+                        "            border-radius: 5px;\n" +
+                        "            border: 2px solid #f5c6cb;\n" +
+                        "            margin-bottom: 20px;\n" +
+                        "        }");
+            }
+            html.append("\n" +
                     "        .form-container h2 {\n" +
                     "            text-align: center;\n" +
                     "            margin-bottom: 20px;\n" +
@@ -144,7 +168,7 @@ public class QuizServlet extends HttpServlet {
                     "\n" +
                     "        .form-container .buttons {\n" +
                     "            display: flex;\n" +
-                    "            justify-content: space-between;\n" +
+                    "            justify-content: center;\n" +
                     "            margin-top: 20px;\n" +
                     "        }\n" +
                     "\n" +
@@ -184,6 +208,13 @@ public class QuizServlet extends HttpServlet {
             if (userAnswerExists) {
                 html.append("<div class=\"static-label\">").append(userAnswer).append("</div>");
             }
+            else if(userScore != -1){
+                String alternativeUserAnswer = "Incorrect";
+                if(userScore == 1){
+                    alternativeUserAnswer = "Correct";
+                }
+                html.append("<div class=\"static-label\">").append(alternativeUserAnswer).append("</div>");
+            }
 
             Question question = questions.get(currentPage - 1);
             List<Answer> answers = question.getAnswers();
@@ -191,7 +222,16 @@ public class QuizServlet extends HttpServlet {
 
             for (int i = 0; i < answers.size(); i++) {
                 Answer answer = answers.get(i);
-                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + "-" + answer.getId() + "\">\n" +
+                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + "-" + answer.getId() + "\"");
+                if (!(scoreList.get(currentPage - 1) == (-1))) {
+                    html.append("disabled");
+                }
+
+                if (checkedList.get(currentPage - 1) == i) {
+                    html.append(" checked");
+                }
+
+                html.append(">\n" +
                         "<label class=\"option\" for=\"option" + (i + 1) + "\">\n" +
                         " <span class=\"option-text\">" + answer.getName() + "</span>\n" +
                         "</label>\n" +
@@ -204,8 +244,10 @@ public class QuizServlet extends HttpServlet {
                 html.append("<button type=\"button\" class=\"secondary\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/quiz?page=" +
                         previousPage + "'\">Previous</button>");
             }
+            if (scoreList.get(currentPage - 1) == (-1)) {
+                html.append(" <button type=\"submit\">Submit</button>\n");
+            }
 
-            html.append(" <button type=\"submit\">Submit</button>\n");
             if (!(currentPage >= questions.size())) {
                 html.append(" <button type=\"button\" class=\"secondary\" " +
                         "onclick=\"window.location.href='http://localhost:8080/servlets-quiz/quiz?page="
@@ -236,6 +278,7 @@ public class QuizServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         Set<String> correctIds = (Set<String>) session.getAttribute("correctIds");
         boolean isUserAnswerCorrect = correctIds.contains(userAnswer);
+
         System.out.println("isUserAnswerCorrect " + isUserAnswerCorrect);
         if (isUserAnswerCorrect) {
             session.setAttribute("score", 1);
@@ -247,9 +290,20 @@ public class QuizServlet extends HttpServlet {
         if (!session.isNew()) {
             Object attribute = session.getAttribute("scoreList");
             List<Integer> attributeScoreList = (ArrayList<Integer>) attribute;
+            Object attributeCheckedList = session.getAttribute("checkedList");
+            List<Integer> checkedList = (ArrayList<Integer>) attributeCheckedList;
             Integer score = (Integer) session.getAttribute("score");
             if (score != null) {
                 Integer currentPage = (Integer) session.getAttribute("currentPage");
+
+                String[] split = userAnswer.split("-");
+
+                Integer subtractAmount = 1;
+                for (int i = 1; i < currentPage; i++) {
+                    subtractAmount += 3;
+                }
+                checkedList.add(currentPage - 1, Integer.parseInt(split[1]) - subtractAmount);
+
                 System.out.println("attributeScoreList size " + attributeScoreList.size());
                 System.out.println("currentPage - 1 " + (currentPage - 1));
                 try {
@@ -264,7 +318,12 @@ public class QuizServlet extends HttpServlet {
                 for (Integer i : attributeScoreList) {
                     System.out.println(i);
                 }
+                System.out.println("\n\nChecked List: ");
+                for (Integer s : checkedList) {
+                    System.out.println(s);
+                }
             }
+            session.setAttribute("checkedList", checkedList);
             session.setAttribute("scoreList", attributeScoreList);
         }
         doGet(req, resp);
