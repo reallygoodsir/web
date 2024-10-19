@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class QuizServlet extends HttpServlet {
     @Override
@@ -22,8 +24,26 @@ public class QuizServlet extends HttpServlet {
                 List<Question> questions = questionsDAO.getQuestions();
                 session.setAttribute("questions", questions);
 
+                Set<String> correctIds = new HashSet<>();
+                for (Question question : questions) {
+                    Integer questionId = question.getId();
+                    List<Answer> answers = question.getAnswers();
+                    for (Answer answer : answers) {
+                        if ("true".equalsIgnoreCase(answer.getIsCorrect())) {
+                            Integer answerId = answer.getId();
+                            correctIds.add(questionId + "-" + answerId);
+                        }
+                    }
+                }
+                session.setAttribute("correctIds", correctIds);
                 session.setAttribute("score", 0);
-                session.setAttribute("scoreList", new ArrayList<>(questions.size()));
+
+                // populate score list with default ( incorrect ) zero values
+                List<Integer> scoreList = new ArrayList<>();
+                for (int i = 0; i < questions.size(); i++) {
+                    scoreList.add(0);
+                }
+                session.setAttribute("scoreList", scoreList);
             }
             List<Question> questions = (List<Question>) session.getAttribute("questions");
 
@@ -214,27 +234,9 @@ public class QuizServlet extends HttpServlet {
         String userAnswer = req.getParameter("options");
         System.out.println("userAnswer " + userAnswer);
         HttpSession session = req.getSession(false);
-        String[] userAnswerArr = userAnswer.split("-");
-        Integer userSelectedQuestionId = Integer.valueOf(userAnswerArr[0]);
-        Integer userSelectedAnswerId = Integer.valueOf(userAnswerArr[1]);
-        System.out.println("userSelectedQuestionId " + userSelectedQuestionId + " userSelectedAnswerId " + userSelectedAnswerId);
-        boolean isUserAnswerCorrect = false;
-        List<Question> questions = (List<Question>) session.getAttribute("questions");
-        for (Question question : questions) {
-            if (question.getId().equals(userSelectedQuestionId)) {
-                List<Answer> answers = question.getAnswers();
-                for (Answer answer : answers) {
-                    if (answer.getId().equals(userSelectedAnswerId)) {
-                        if ("true".equalsIgnoreCase(answer.getIsCorrect())) {
-                            isUserAnswerCorrect = true;
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
+        Set<String> correctIds = (Set<String>) session.getAttribute("correctIds");
+        boolean isUserAnswerCorrect = correctIds.contains(userAnswer);
+        System.out.println("isUserAnswerCorrect " + isUserAnswerCorrect);
         if (isUserAnswerCorrect) {
             session.setAttribute("score", 1);
             session.setAttribute("userAnswerStatus", "Correct");
@@ -251,13 +253,13 @@ public class QuizServlet extends HttpServlet {
                 System.out.println("attributeScoreList size " + attributeScoreList.size());
                 System.out.println("currentPage - 1 " + (currentPage - 1));
                 try {
-                    if (attributeScoreList.get(currentPage - 1) != null) {
-                        attributeScoreList.remove(currentPage - 1);
-                    }
+                    System.out.println(">>>>>>>>>>>>>> before");
+                    attributeScoreList.set(currentPage - 1, score);
+                    System.out.println(">>>>>>>>>>>>>> after");
                 } catch (Exception e) {
-                    System.out.println("Ignore exception " + e.getMessage());
+                    System.out.println("Ignore >>>>>>>>>>>>>>>>>>>>>>>>>>>> exception " + e.getMessage());
                 }
-                attributeScoreList.add(currentPage - 1, score);
+
                 System.out.println("Attribute Score List: ");
                 for (Integer i : attributeScoreList) {
                     System.out.println(i);
