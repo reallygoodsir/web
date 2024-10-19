@@ -171,7 +171,7 @@ public class QuizServlet extends HttpServlet {
 
             for (int i = 0; i < answers.size(); i++) {
                 Answer answer = answers.get(i);
-                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + answer.getIsCorrect() + "\">\n" +
+                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + "-" + answer.getId() + "\">\n" +
                         "<label class=\"option\" for=\"option" + (i + 1) + "\">\n" +
                         " <span class=\"option-text\">" + answer.getName() + "</span>\n" +
                         "</label>\n" +
@@ -212,11 +212,30 @@ public class QuizServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String userAnswer = req.getParameter("options");
-        if (userAnswer == null) {
-            userAnswer = "false";
-        }
+        System.out.println("userAnswer " + userAnswer);
         HttpSession session = req.getSession(false);
-        if (userAnswer.equalsIgnoreCase("true")) {
+        String[] userAnswerArr = userAnswer.split("-");
+        Integer userSelectedQuestionId = Integer.valueOf(userAnswerArr[0]);
+        Integer userSelectedAnswerId = Integer.valueOf(userAnswerArr[1]);
+        System.out.println("userSelectedQuestionId " + userSelectedQuestionId + " userSelectedAnswerId " + userSelectedAnswerId);
+        boolean isUserAnswerCorrect = false;
+        List<Question> questions = (List<Question>) session.getAttribute("questions");
+        for (Question question : questions) {
+            if (question.getId().equals(userSelectedQuestionId)) {
+                List<Answer> answers = question.getAnswers();
+                for (Answer answer : answers) {
+                    if (answer.getId().equals(userSelectedAnswerId)) {
+                        if ("true".equalsIgnoreCase(answer.getIsCorrect())) {
+                            isUserAnswerCorrect = true;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (isUserAnswerCorrect) {
             session.setAttribute("score", 1);
             session.setAttribute("userAnswerStatus", "Correct");
         } else {
