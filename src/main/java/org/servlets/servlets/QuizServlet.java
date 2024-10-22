@@ -26,11 +26,11 @@ public class QuizServlet extends HttpServlet {
 
                 Set<String> correctIds = new HashSet<>();
                 for (Question question : questions) {
-                    Integer questionId = question.getId();
+                    String questionId = question.getId();
                     List<Answer> answers = question.getAnswers();
                     for (Answer answer : answers) {
-                        if ("true".equalsIgnoreCase(answer.getIsCorrect())) {
-                            Integer answerId = answer.getId();
+                        if (answer.getIsCorrect()) {
+                            String answerId = answer.getId();
                             correctIds.add(questionId + "-" + answerId);
                         }
                     }
@@ -207,10 +207,9 @@ public class QuizServlet extends HttpServlet {
 
             if (userAnswerExists) {
                 html.append("<div class=\"static-label\">").append(userAnswer).append("</div>");
-            }
-            else if(userScore != -1){
+            } else if (userScore != -1) {
                 String alternativeUserAnswer = "Incorrect";
-                if(userScore == 1){
+                if (userScore == 1) {
                     alternativeUserAnswer = "Correct";
                 }
                 html.append("<div class=\"static-label\">").append(alternativeUserAnswer).append("</div>");

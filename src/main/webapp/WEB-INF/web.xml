@@ -32,4 +32,50 @@
     <servlet-name>results-servlet</servlet-name>
     <url-pattern>/results</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>show-questions-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.ShowQuestionsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>show-questions-servlet</servlet-name>
+    <url-pattern>/questions</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>edit-questions-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.EditServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>edit-questions-servlet</servlet-name>
+    <url-pattern>/questions/edit</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>delete-questions-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>delete-questions-servlet</servlet-name>
+    <url-pattern>/questions/delete</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>view-questions-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.ViewServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>view-questions-servlet</servlet-name>
+    <url-pattern>/questions/view</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>add-questions-servlet</servlet-name>
+    <servlet-class>org.servlets.servlets.AddServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>add-questions-servlet</servlet-name>
+    <url-pattern>/questions/add</url-pattern>
+  </servlet-mapping>
 </web-app>

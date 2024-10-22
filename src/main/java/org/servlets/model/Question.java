@@ -3,7 +3,7 @@ package org.servlets.model;
 import java.util.List;
 
 public class Question {
-    private Integer id;
+    private String id;
     private String name;
     private List<Answer> answers;
 
@@ -14,17 +14,22 @@ public class Question {
         this.name = name;
     }
 
-    public Question(Integer id, String name, List<Answer> answers) {
+    public Question(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Question(String id, String name, List<Answer> answers) {
         this.id = id;
         this.name = name;
         this.answers = answers;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

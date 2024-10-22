@@ -1,30 +1,30 @@
 package org.servlets.model;
 
 public class Answer {
-    private Integer id;
+    private String id;
     private String name;
-    private String isCorrect;
-    private Integer questionId;
+    private boolean isCorrect;
+    private String questionId;
 
     public Answer() {
     }
 
-    public Answer(String name, String isCorrect) {
+    public Answer(String name, boolean isCorrect) {
         this.name = name;
         this.isCorrect = isCorrect;
     }
 
-    public Answer(Integer id, String name, String isCorrect) {
+    public Answer(String id, String name, boolean isCorrect) {
         this.id = id;
         this.name = name;
         this.isCorrect = isCorrect;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -36,19 +36,19 @@ public class Answer {
         this.name = name;
     }
 
-    public String getIsCorrect() {
+    public boolean getIsCorrect() {
         return isCorrect;
     }
 
-    public void setIsCorrect(String isCorrect) {
+    public void setIsCorrect(boolean isCorrect) {
         this.isCorrect = isCorrect;
     }
 
-    public Integer getQuestionId() {
+    public String getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Integer questionId) {
+    public void setQuestionId(String questionId) {
         this.questionId = questionId;
     }
 
