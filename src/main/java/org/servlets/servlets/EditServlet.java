@@ -4,7 +4,6 @@ import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,12 +11,11 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EditServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String questionId = req.getParameter("id");
         HttpSession session = req.getSession(true);
         session.setAttribute("questionId", questionId);
@@ -145,10 +143,10 @@ public class EditServlet extends HttpServlet {
                 boolean isCorrect = answer.getIsCorrect();
                 int answerIndex = i + 1;
                 html.append("            <div class=\"form-group\">\n" +
-                        "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
-                        "                <textarea id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" required>" + answer.getName() + "</textarea>\n" +
-                        "                <label for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
-                        "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" required>\n");
+                        "                <label for=\"answer-" + answer.getId() + "\">Answer " + answerIndex + ":</label>\n" +
+                        "                <textarea id=\"answer-" + answer.getId() + "\" name=\"answer-" + answer.getId() + "\" required>" + answer.getName() + "</textarea>\n" +
+                        "                <label for=\"isCorrect-" + answer.getId() + "\">Is Correct:</label>\n" +
+                        "                <select id=\"isCorrect-" + answer.getId() + "\" name=\"isCorrect-" + answer.getId() + "\" required>\n");
                 if (isCorrect) {
                     html.append("                    <option value=\"true\" selected>True</option>\n");
                     html.append("                    <option value=\"false\">False</option>\n");
@@ -178,27 +176,23 @@ public class EditServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String questionName = req.getParameter("question");
-        HttpSession session = req.getSession(false);
-        String questionId = (String) session.getAttribute("questionId");
-
-        QuestionsDAO questionsDAO = new QuestionsDAO();
-        Question oldQuestion = questionsDAO.getQuestionById(questionId);
-        Question newQuestion = new Question(questionName);
-        newQuestion.setName(questionName);
-        List<Answer> answers = new ArrayList<>();
-        for (int i = 1; i <= oldQuestion.getAnswers().size(); i++) {
-            String answerName = req.getParameter("answer" + i);
-            boolean answerIsCorrect = Boolean.parseBoolean(req.getParameter("isCorrect" + i));
-            Answer answer = new Answer();
-            answer.setName(answerName);
-            answer.setIsCorrect(answerIsCorrect);
-            answer.setQuestionId(newQuestion.getId());
-            answers.add(answer);
-        }
-        newQuestion.setAnswers(answers);
         try {
-            questionsDAO.editQuestion(oldQuestion, newQuestion);
+            String questionName = req.getParameter("question");
+            HttpSession session = req.getSession(false);
+            String questionId = (String) session.getAttribute("questionId");
+
+            QuestionsDAO questionsDAO = new QuestionsDAO();
+            Question question = questionsDAO.getQuestionById(questionId);
+            question.setName(questionName);
+            List<Answer> answers = question.getAnswers();
+            for (int i = 1; i <= answers.size(); i++) {
+                Answer answer = answers.get(i - 1);
+                String answerName = req.getParameter("answer-" + answer.getId());
+                boolean isCorrect = Boolean.parseBoolean(req.getParameter("isCorrect-" + answer.getId()));
+                answer.setName(answerName);
+                answer.setIsCorrect(isCorrect);
+            }
+            questionsDAO.editQuestion(question);
             resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
         } catch (SQLException e) {
             throw new RuntimeException(e);

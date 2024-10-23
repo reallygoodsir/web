@@ -9,6 +9,9 @@ import java.util.*;
 public class QuestionsDAO extends BaseDAO {
     private static final String INSERT_ANSWER = "INSERT INTO answers (id, name, is_correct, question_id) VALUES (?, ?, ?, ?)";
     private static final String INSERT_QUESTION = "INSERT INTO questions (id, name) VALUES (?, ?)";
+    private static final String DELETE_QUESTION = "DELETE FROM questions WHERE id = ?";
+    private static final String EDIT_QUESTION = "UPDATE questions SET name = ? WHERE id = ?";
+    private static final String EDIT_ANSWER = "UPDATE answers SET name = ?, is_correct = ? WHERE id = ?";
     private static final String GET_QUESTIONS_AND_ANSWERS = "SELECT \n" +
             "    questions.id AS question_id, \n" +
             "    questions.name AS question_name, \n" +
@@ -33,9 +36,6 @@ public class QuestionsDAO extends BaseDAO {
             "ON questions.id = answers.question_id\n" +
             "AND questions.id = ?";
 
-    private static final String DELETE_QUESTION = "delete from questions where id = ?";
-    private static final String EDIT_QUESTION = "update questions set name = ? where id = ?";
-    private static final String EDIT_ANSWER = "update answers set name = ?, is_correct = ? where id = ?";
 
     public void saveQuestion(Question question) throws SQLException {
         System.out.println("Start save question: " + question);
@@ -171,49 +171,42 @@ public class QuestionsDAO extends BaseDAO {
             System.out.println("affectedRows " + affectedRows);
             connection.commit();
         } catch (Exception e) {
-            e.printStackTrace();
             connection.rollback();
         } finally {
             connection.close();
         }
     }
 
-    public void editQuestion(Question oldQuestion, Question newQuestion) throws SQLException {
+    public void editQuestion(Question question) throws SQLException {
         Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
         connection.setAutoCommit(false);
         try {
             PreparedStatement statementQuestion = connection.prepareStatement(EDIT_QUESTION);
-            statementQuestion.setString(1, newQuestion.getName());
-            statementQuestion.setString(2, oldQuestion.getId());
+            statementQuestion.setString(1, question.getName());
+            statementQuestion.setString(2, question.getId());
             int affectedQuestionRows = statementQuestion.executeUpdate();
             System.out.println("affectedQuestionRows " + affectedQuestionRows);
             if (affectedQuestionRows == 1) {
-                List<Answer> oldAnswers = oldQuestion.getAnswers();
-                List<Answer> newAnswers = newQuestion.getAnswers();
-                for (int i = 0; i < newAnswers.size() && i < oldAnswers.size(); i++) {
-                    Answer newAnswer = newAnswers.get(i);
+                List<Answer> answers = question.getAnswers();
+                for (Answer answer : answers) {
                     PreparedStatement statementAnswer = connection.prepareStatement(EDIT_ANSWER);
-                    statementAnswer.setString(1, newAnswer.getName());
-                    statementAnswer.setBoolean(2, newAnswer.getIsCorrect());
-
-                    Answer oldAnswer = oldAnswers.get(i);
-                    String id = oldAnswer.getId();
-                    statementAnswer.setString(3, id);
+                    statementAnswer.setString(1, answer.getName());
+                    statementAnswer.setBoolean(2, answer.getIsCorrect());
+                    statementAnswer.setString(3, answer.getId());
                     int affectedAnswersRows = statementAnswer.executeUpdate();
                     if (affectedAnswersRows == 1) {
-                        System.out.println("Successfully updated answer " + oldAnswer.getId());
+                        System.out.println("Successfully updated answer " + answer.getId());
                     } else {
-                        System.out.println("Failed to update answer " + oldAnswer.getId());
-                        throw new RuntimeException("Failed to update answer " + oldAnswer.getId());
+                        System.out.println("Failed to update answer " + answer.getId());
+                        throw new RuntimeException("Failed to update answer " + answer.getId());
                     }
                 }
             } else {
-                System.out.println("Failed to update the question " + oldQuestion);
-                throw new RuntimeException("Failed to update the question " + oldQuestion);
+                System.out.println("Failed to update the question " + question);
+                throw new RuntimeException("Failed to update the question " + question);
             }
             connection.commit();
         } catch (Exception e) {
-            e.printStackTrace();
             connection.rollback();
         } finally {
             connection.close();
