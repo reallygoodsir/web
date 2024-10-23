@@ -23,7 +23,8 @@ public class QuestionsDAO extends BaseDAO {
             "INNER JOIN \n" +
             "    answers \n" +
             "ON \n" +
-            "    questions.id = answers.question_id;";
+            "    questions.id = answers.question_id \n" +
+            "ORDER BY answers.id";
     private static final String GET_QUESTION_BY_ID = "SELECT \n" +
             "  questions.id AS question_id, \n" +
             "  questions.name AS question_name, \n" +
@@ -34,66 +35,75 @@ public class QuestionsDAO extends BaseDAO {
             "  questions \n" +
             "INNER JOIN answers \n" +
             "ON questions.id = answers.question_id\n" +
-            "AND questions.id = ?";
+            "AND questions.id = ?\n" +
+            "ORDER BY answers.id";
 
 
     public void saveQuestion(Question question) throws SQLException {
-        System.out.println("Start save question: " + question);
-        Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-        connection.setAutoCommit(false);
-        try {
-            PreparedStatement statementAddQuestion = connection.prepareStatement(INSERT_QUESTION);
-            statementAddQuestion.setString(1, question.getId());
-            statementAddQuestion.setString(2, question.getName());
-            System.out.println("Saving question to db ");
-            int affectedQuestionRows = statementAddQuestion.executeUpdate();
-            System.out.println("affectedRows " + affectedQuestionRows);
-            if (affectedQuestionRows == 1) {
-                if (question.getAnswers() == null || question.getAnswers().isEmpty()) {
-                    System.out.println("Failed to save answers because we dont have them for question " + question.getId());
-                    throw new RuntimeException("No nswers for question " + question.getId());
+        System.out.println("Start saving question: " + question);
+
+        // Try-with-resources for Connection ensures it is closed automatically.
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
+            connection.setAutoCommit(false);
+
+            // Save question to the database.
+            try (PreparedStatement statementAddQuestion = connection.prepareStatement(INSERT_QUESTION)) {
+                statementAddQuestion.setString(1, question.getId());
+                statementAddQuestion.setString(2, question.getName());
+                int affectedQuestionRows = statementAddQuestion.executeUpdate();
+                System.out.println("Affected question rows: " + affectedQuestionRows);
+
+                if (affectedQuestionRows != 1) {
+                    throw new RuntimeException("Failed to save the question: " + question);
                 }
-                for (Answer answer : question.getAnswers()) {
-                    System.out.println("Saving answer " + answer.toString() + " with question id " + question.getId());
-                    PreparedStatement statementAddAnswers = connection.prepareStatement(INSERT_ANSWER);
-                    statementAddAnswers.setString(1, answer.getId());
-                    statementAddAnswers.setString(2, answer.getName());
-                    statementAddAnswers.setBoolean(3, answer.getIsCorrect());
-                    statementAddAnswers.setString(4, question.getId());
-                    int affectedAnswersRows = statementAddAnswers.executeUpdate();
-                    if (affectedAnswersRows == 1) {
-                        System.out.println("Successfully saved an answer " + answer + " with question id " + question.getId());
-                    } else {
-                        System.out.println("Failed to save an answer " + answer + " with question id " + question.getId());
-                        throw new RuntimeException("Failed to save an answer " + answer);
+
+                // Validate answers before proceeding.
+                if (question.getAnswers() == null || question.getAnswers().isEmpty()) {
+                    throw new IllegalArgumentException("No answers provided for question " + question.getId());
+                }
+
+                // Save each answer.
+                try (PreparedStatement statementAddAnswers = connection.prepareStatement(INSERT_ANSWER)) {
+                    for (Answer answer : question.getAnswers()) {
+                        statementAddAnswers.setString(1, answer.getId());
+                        statementAddAnswers.setString(2, answer.getName());
+                        statementAddAnswers.setBoolean(3, answer.getIsCorrect());
+                        statementAddAnswers.setString(4, question.getId());
+                        int affectedAnswersRows = statementAddAnswers.executeUpdate();
+
+                        if (affectedAnswersRows != 1) {
+                            throw new RuntimeException("Failed to save an answer: " + answer);
+                        }
+                        System.out.println("Successfully saved answer: " + answer + " with question id " + question.getId());
                     }
                 }
-            } else {
-                System.out.println("Failed to save an question " + question);
-                throw new RuntimeException("Failed to save the question " + question);
+
+                // Commit transaction.
+                connection.commit();
+                System.out.println("Transaction committed successfully.");
+            } catch (SQLException e) {
+                connection.rollback();
+                System.err.println("Transaction rolled back due to error: " + e.getMessage());
+                throw e; // Rethrow to indicate failure to the caller.
             }
-            System.out.println("Before commit transaction");
-            connection.commit();
-            System.out.println("After commit transaction");
-        } catch (Exception exception) {
-            System.out.println("ERROR: " + exception.getMessage());
-            System.out.println("Rollback transaction");
-            connection.rollback();
-        } finally {
-            System.out.println("Close connection");
-            connection.close();
+
+        } catch (SQLException e) {
+            System.err.println("Error while saving question: " + e.getMessage());
+            throw e; // Propagate exception to the caller for handling.
         }
-        System.out.println("End save question: " + question);
+
+        System.out.println("End saving question: " + question);
     }
+
 
     public List<Question> getQuestions() throws SQLException {
         List<Question> result = new ArrayList<>();
+        Map<String, Question> questionMap = new HashMap<>();
 
+        // Try-with-resources for automatic closing of resources.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
              PreparedStatement statementGetQuestions = connection.prepareStatement(GET_QUESTIONS_AND_ANSWERS);
              ResultSet resultSet = statementGetQuestions.executeQuery()) {
-
-            Map<String, Question> questionMap = new HashMap<>();
 
             while (resultSet.next()) {
                 String questionId = resultSet.getString("question_id");
@@ -102,114 +112,134 @@ public class QuestionsDAO extends BaseDAO {
                 String answerName = resultSet.getString("answer_name");
                 boolean answerIsCorrect = resultSet.getBoolean("answer_is_correct");
 
-                Question question = questionMap.get(questionId);
-                if (question == null) {
-                    question = new Question();
-                    question.setId(questionId);
-                    question.setName(questionName);
-                    question.setAnswers(new ArrayList<Answer>());
-                    questionMap.put(questionId, question);
-                    result.add(question);
-                }
+                // Use computeIfAbsent to get or create a new question.
+                Question question = questionMap.computeIfAbsent(questionId, id -> {
+                    Question q = new Question();
+                    q.setId(id);
+                    q.setName(questionName);
+                    q.setAnswers(new ArrayList<>());
+                    result.add(q);
+                    return q;
+                });
 
-                // Create a new answer and add it to the question's list of answers
-                Answer answer = new Answer();
-                answer.setId(answerId);
-                answer.setName(answerName);
-                answer.setIsCorrect(answerIsCorrect);
-                List<Answer> answers = question.getAnswers();
-                answers.add(answer);
+                // Only add an answer if it exists in the resultSet.
+                if (answerId != null) {
+                    Answer answer = new Answer();
+                    answer.setId(answerId);
+                    answer.setName(answerName);
+                    answer.setIsCorrect(answerIsCorrect);
+                    question.getAnswers().add(answer);
+                }
             }
-        } catch (Exception e) {
-            System.out.println("Error fetching questions: " + e.getMessage());
+        } catch (SQLException e) {
+            // Log the exception (consider using a proper logging framework).
+            System.err.println("Error fetching questions: " + e.getMessage());
+            throw e; // Rethrow the exception to let the caller handle it.
         }
+
         return result;
     }
 
     public Question getQuestionById(String id) {
         Question question = null;
-        try {
-            Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-            PreparedStatement statementGetQuestionById = connection.prepareStatement(GET_QUESTION_BY_ID);
+
+        // Try-with-resources for automatic closing of resources.
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
+             PreparedStatement statementGetQuestionById = connection.prepareStatement(GET_QUESTION_BY_ID)) {
+
             statementGetQuestionById.setString(1, id);
-            ResultSet resultSet = statementGetQuestionById.executeQuery();
 
-            while (resultSet.next()) {
-                String questionId = resultSet.getString("question_id");
-                String questionName = resultSet.getString("question_name");
-                String answerId = resultSet.getString("answer_id");
-                String answerName = resultSet.getString("answer_name");
-                boolean answerIsCorrect = resultSet.getBoolean("answer_is_correct");
+            try (ResultSet resultSet = statementGetQuestionById.executeQuery()) {
+                while (resultSet.next()) {
+                    if (question == null) {
+                        question = new Question();
+                        question.setId(resultSet.getString("question_id"));
+                        question.setName(resultSet.getString("question_name"));
+                        question.setAnswers(new ArrayList<>());
+                    }
 
-                if (question == null) {
-                    question = new Question();
-                    question.setId(questionId);
-                    question.setName(questionName);
-                    question.setAnswers(new ArrayList<Answer>());
+                    // Create and add the answer to the question.
+                    String answerId = resultSet.getString("answer_id");
+                    if (answerId != null) { // Ensure that answerId exists before adding.
+                        Answer answer = new Answer();
+                        answer.setId(answerId);
+                        answer.setName(resultSet.getString("answer_name"));
+                        answer.setIsCorrect(resultSet.getBoolean("answer_is_correct"));
+                        question.getAnswers().add(answer);
+                    }
                 }
-
-                Answer answer = new Answer();
-                answer.setId(answerId);
-                answer.setName(answerName);
-                answer.setIsCorrect(answerIsCorrect);
-                List<Answer> answers = question.getAnswers();
-                answers.add(answer);
             }
         } catch (Exception e) {
-            System.out.println("Error fetching questions: " + e.getMessage());
+            System.err.println("Error fetching question by ID: " + e.getMessage());
         }
+
         return question;
     }
 
     public void deleteQuestion(String questionId) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-        connection.setAutoCommit(false);
-        try {
-            PreparedStatement ps = connection.prepareStatement(DELETE_QUESTION);
-            ps.setString(1, questionId);
-            int affectedRows = ps.executeUpdate();
-            System.out.println("affectedRows " + affectedRows);
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-        } finally {
-            connection.close();
+        // Try-with-resources for automatic closing of resources.
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps = connection.prepareStatement(DELETE_QUESTION)) {
+                ps.setString(1, questionId);
+                int affectedRows = ps.executeUpdate();
+
+                if (affectedRows == 0) {
+                    throw new SQLException("No question found with ID: " + questionId);
+                }
+
+                System.out.println("Deleted " + affectedRows + " row(s) for question ID: " + questionId);
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                System.err.println("Error deleting question with ID " + questionId + ": " + e.getMessage());
+                throw e; // Rethrow the exception to notify the caller.
+            }
         }
     }
 
     public void editQuestion(Question question) throws SQLException {
-        Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
-        connection.setAutoCommit(false);
-        try {
-            PreparedStatement statementQuestion = connection.prepareStatement(EDIT_QUESTION);
-            statementQuestion.setString(1, question.getName());
-            statementQuestion.setString(2, question.getId());
-            int affectedQuestionRows = statementQuestion.executeUpdate();
-            System.out.println("affectedQuestionRows " + affectedQuestionRows);
-            if (affectedQuestionRows == 1) {
-                List<Answer> answers = question.getAnswers();
-                for (Answer answer : answers) {
-                    PreparedStatement statementAnswer = connection.prepareStatement(EDIT_ANSWER);
-                    statementAnswer.setString(1, answer.getName());
-                    statementAnswer.setBoolean(2, answer.getIsCorrect());
-                    statementAnswer.setString(3, answer.getId());
-                    int affectedAnswersRows = statementAnswer.executeUpdate();
-                    if (affectedAnswersRows == 1) {
-                        System.out.println("Successfully updated answer " + answer.getId());
-                    } else {
-                        System.out.println("Failed to update answer " + answer.getId());
-                        throw new RuntimeException("Failed to update answer " + answer.getId());
+        // Try-with-resources for automatic closing of resources.
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement statementQuestion = connection.prepareStatement(EDIT_QUESTION)) {
+                // Update the question details.
+                statementQuestion.setString(1, question.getName());
+                statementQuestion.setString(2, question.getId());
+                int affectedQuestionRows = statementQuestion.executeUpdate();
+
+                if (affectedQuestionRows == 1) {
+                    System.out.println("Updated question " + question.getId());
+
+                    // Update the answers.
+                    List<Answer> answers = question.getAnswers();
+                    try (PreparedStatement statementAnswer = connection.prepareStatement(EDIT_ANSWER)) {
+                        for (Answer answer : answers) {
+                            statementAnswer.setString(1, answer.getName());
+                            statementAnswer.setBoolean(2, answer.getIsCorrect());
+                            statementAnswer.setString(3, answer.getId());
+                            int affectedAnswersRows = statementAnswer.executeUpdate();
+
+                            if (affectedAnswersRows == 1) {
+                                System.out.println("Successfully updated answer " + answer.getId());
+                            } else {
+                                throw new SQLException("Failed to update answer " + answer.getId());
+                            }
+                        }
                     }
+                } else {
+                    throw new SQLException("Failed to update the question with ID: " + question.getId());
                 }
-            } else {
-                System.out.println("Failed to update the question " + question);
-                throw new RuntimeException("Failed to update the question " + question);
+
+                connection.commit();
+                System.out.println("Transaction committed for question " + question.getId());
+            } catch (SQLException e) {
+                connection.rollback();
+                System.err.println("Transaction rolled back for question " + question.getId() + ": " + e.getMessage());
+                throw e; // Rethrow the exception to notify the caller.
             }
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-        } finally {
-            connection.close();
         }
     }
 }
