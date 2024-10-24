@@ -1,5 +1,7 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
@@ -14,6 +16,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class EditServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(EditServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String questionId = req.getParameter("id");
@@ -195,6 +199,7 @@ public class EditServlet extends HttpServlet {
             questionsDAO.editQuestion(question);
             resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
         } catch (SQLException e) {
+            logger.error("Exception occurred editing existing question", e);
             throw new RuntimeException(e);
         }
     }

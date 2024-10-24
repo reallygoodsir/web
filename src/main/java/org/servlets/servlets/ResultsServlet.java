@@ -1,5 +1,8 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,13 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResultsServlet extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(false);
-        if(session == null){
-            resp.setStatus(500);
+    private static final Logger logger = LogManager.getLogger(ResultsServlet.class);
 
-        }else{
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            logger.error("Expected to have session but session was not found.");
+            resp.setStatus(500);
+        } else {
             Object attribute = session.getAttribute("scoreList");
             List<Integer> attributeScoreList = (ArrayList<Integer>) attribute;
             Integer finalScore = 0;

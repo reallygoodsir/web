@@ -1,5 +1,7 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class AddServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(AddServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         StringBuilder html = new StringBuilder();
@@ -136,7 +140,7 @@ public class AddServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            System.out.println("Start AddServlet doPost");
+            logger.info("Start adding question");
             Answer firstAnswer = new Answer(UUID.randomUUID().toString(), req.getParameter("answerOne"),
                     Boolean.parseBoolean(req.getParameter("isTrueOne")));
             Answer secondAnswer = new Answer(UUID.randomUUID().toString(), req.getParameter("answerTwo"),
@@ -159,8 +163,9 @@ public class AddServlet extends HttpServlet {
 
             resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
         } catch (Exception e) {
+            logger.error("Exception occurred adding new question", e);
             throw new RuntimeException(e);
         }
-        System.out.println("End AddServlet doPost");
+        logger.info("End adding question");
     }
 }

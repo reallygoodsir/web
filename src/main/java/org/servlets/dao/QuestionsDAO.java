@@ -6,7 +6,11 @@ import org.servlets.model.Question;
 import java.sql.*;
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class QuestionsDAO extends BaseDAO {
+    private static final Logger logger = LogManager.getLogger(QuestionsDAO.class);
     private static final String INSERT_ANSWER = "INSERT INTO answers (id, name, is_correct, question_id) VALUES (?, ?, ?, ?)";
     private static final String INSERT_QUESTION = "INSERT INTO questions (id, name) VALUES (?, ?)";
     private static final String DELETE_QUESTION = "DELETE FROM questions WHERE id = ?";
@@ -40,7 +44,7 @@ public class QuestionsDAO extends BaseDAO {
 
 
     public void saveQuestion(Question question) throws SQLException {
-        System.out.println("Start saving question: " + question);
+        logger.info("Start saving question: {}", question);
 
         // Try-with-resources for Connection ensures it is closed automatically.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
@@ -51,14 +55,16 @@ public class QuestionsDAO extends BaseDAO {
                 statementAddQuestion.setString(1, question.getId());
                 statementAddQuestion.setString(2, question.getName());
                 int affectedQuestionRows = statementAddQuestion.executeUpdate();
-                System.out.println("Affected question rows: " + affectedQuestionRows);
+                logger.info("Affected question rows: {}", affectedQuestionRows);
 
                 if (affectedQuestionRows != 1) {
+                    logger.error("Affected question rows expected {} but received {}", 1, affectedQuestionRows);
                     throw new RuntimeException("Failed to save the question: " + question);
                 }
 
                 // Validate answers before proceeding.
                 if (question.getAnswers() == null || question.getAnswers().isEmpty()) {
+                    logger.error("No answers provided for question id {}", question.getId());
                     throw new IllegalArgumentException("No answers provided for question " + question.getId());
                 }
 
@@ -74,25 +80,25 @@ public class QuestionsDAO extends BaseDAO {
                         if (affectedAnswersRows != 1) {
                             throw new RuntimeException("Failed to save an answer: " + answer);
                         }
-                        System.out.println("Successfully saved answer: " + answer + " with question id " + question.getId());
+                        logger.info("Successfully saved answer {} with question id {}", answer, question.getId());
                     }
                 }
 
                 // Commit transaction.
                 connection.commit();
-                System.out.println("Transaction committed successfully.");
+                logger.info("Transaction committed successfully.");
             } catch (SQLException e) {
                 connection.rollback();
-                System.err.println("Transaction rolled back due to error: " + e.getMessage());
+                logger.error("Transaction rolled back due to error", e);
                 throw e; // Rethrow to indicate failure to the caller.
             }
 
         } catch (SQLException e) {
-            System.err.println("Error while saving question: " + e.getMessage());
+            logger.error("Error while saving question", e);
             throw e; // Propagate exception to the caller for handling.
         }
 
-        System.out.println("End saving question: " + question);
+        logger.info("End saving question: {}", question);
     }
 
 
@@ -132,8 +138,7 @@ public class QuestionsDAO extends BaseDAO {
                 }
             }
         } catch (SQLException e) {
-            // Log the exception (consider using a proper logging framework).
-            System.err.println("Error fetching questions: " + e.getMessage());
+            logger.error("Error fetching questions", e);
             throw e; // Rethrow the exception to let the caller handle it.
         }
 
@@ -170,7 +175,7 @@ public class QuestionsDAO extends BaseDAO {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error fetching question by ID: " + e.getMessage());
+            logger.error("Error fetching question by id", e);
         }
 
         return question;
@@ -189,11 +194,11 @@ public class QuestionsDAO extends BaseDAO {
                     throw new SQLException("No question found with ID: " + questionId);
                 }
 
-                System.out.println("Deleted " + affectedRows + " row(s) for question ID: " + questionId);
+                logger.info("Deleted {} row(s) for question ID: {}", affectedRows, questionId);
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
-                System.err.println("Error deleting question with ID " + questionId + ": " + e.getMessage());
+                logger.error("Error deleting question with ID {}", questionId, e);
                 throw e; // Rethrow the exception to notify the caller.
             }
         }
@@ -211,7 +216,7 @@ public class QuestionsDAO extends BaseDAO {
                 int affectedQuestionRows = statementQuestion.executeUpdate();
 
                 if (affectedQuestionRows == 1) {
-                    System.out.println("Updated question " + question.getId());
+                    logger.info("Updated question {}", question.getId());
 
                     // Update the answers.
                     List<Answer> answers = question.getAnswers();
@@ -223,7 +228,7 @@ public class QuestionsDAO extends BaseDAO {
                             int affectedAnswersRows = statementAnswer.executeUpdate();
 
                             if (affectedAnswersRows == 1) {
-                                System.out.println("Successfully updated answer " + answer.getId());
+                                logger.info("Successfully updated answer {}", answer.getId());
                             } else {
                                 throw new SQLException("Failed to update answer " + answer.getId());
                             }
@@ -234,10 +239,10 @@ public class QuestionsDAO extends BaseDAO {
                 }
 
                 connection.commit();
-                System.out.println("Transaction committed for question " + question.getId());
+                logger.info("Transaction committed for question {}", question.getId());
             } catch (SQLException e) {
                 connection.rollback();
-                System.err.println("Transaction rolled back for question " + question.getId() + ": " + e.getMessage());
+                logger.error("Transaction rolled back for question id {}", question.getId(), e);
                 throw e; // Rethrow the exception to notify the caller.
             }
         }

@@ -1,81 +1,95 @@
 <!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Servlets Quiz</display-name>
+    <display-name>Servlets Quiz</display-name>
+    <filter>
+        <filter-name>SessionValidationFilter</filter-name>
+        <filter-class>org.servlets.filters.SessionValidationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SessionValidationFilter</filter-name>
+        <url-pattern>/questions</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>SessionValidationFilter</filter-name>
+        <url-pattern>/questions/*</url-pattern>
+    </filter-mapping>
 
-  <servlet>
-    <servlet-name>admin-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.AdminServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>admin-servlet</servlet-name>
-    <url-pattern>/admin</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>admin-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.AdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>admin-servlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>quiz-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.QuizServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>quiz-servlet</servlet-name>
+        <url-pattern>/quiz</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>results-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.ResultsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>results-servlet</servlet-name>
+        <url-pattern>/results</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>show-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.ShowQuestionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>show-questions-servlet</servlet-name>
+        <url-pattern>/questions</url-pattern>
+    </servlet-mapping>
 
 
-  <servlet>
-    <servlet-name>quiz-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.QuizServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>quiz-servlet</servlet-name>
-    <url-pattern>/quiz</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>edit-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.EditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>edit-questions-servlet</servlet-name>
+        <url-pattern>/questions/edit</url-pattern>
+    </servlet-mapping>
 
-  <servlet>
-    <servlet-name>results-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.ResultsServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>results-servlet</servlet-name>
-    <url-pattern>/results</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>delete-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.DeleteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>delete-questions-servlet</servlet-name>
+        <url-pattern>/questions/delete</url-pattern>
+    </servlet-mapping>
 
-  <servlet>
-    <servlet-name>show-questions-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.ShowQuestionsServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>show-questions-servlet</servlet-name>
-    <url-pattern>/questions</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>view-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.ViewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>view-questions-servlet</servlet-name>
+        <url-pattern>/questions/view</url-pattern>
+    </servlet-mapping>
 
-
-  <servlet>
-    <servlet-name>edit-questions-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.EditServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>edit-questions-servlet</servlet-name>
-    <url-pattern>/questions/edit</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>delete-questions-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.DeleteServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>delete-questions-servlet</servlet-name>
-    <url-pattern>/questions/delete</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>view-questions-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.ViewServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>view-questions-servlet</servlet-name>
-    <url-pattern>/questions/view</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>add-questions-servlet</servlet-name>
-    <servlet-class>org.servlets.servlets.AddServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>add-questions-servlet</servlet-name>
-    <url-pattern>/questions/add</url-pattern>
-  </servlet-mapping>
+    <servlet>
+        <servlet-name>add-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.AddServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>add-questions-servlet</servlet-name>
+        <url-pattern>/questions/add</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 </web-app>

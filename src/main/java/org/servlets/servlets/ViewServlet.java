@@ -1,5 +1,7 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
@@ -13,6 +15,8 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public class ViewServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(ViewServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String questionId = req.getParameter("id");
@@ -20,6 +24,7 @@ public class ViewServlet extends HttpServlet {
         session.setAttribute("questionId", questionId);
 
         if (questionId == null) {
+            logger.error("Expected to have question id in session but was not found.");
             resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
         } else {
             QuestionsDAO questionsDAO = new QuestionsDAO();

@@ -1,5 +1,7 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 public class QuizServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(QuizServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         HttpSession session = req.getSession(true);
@@ -71,7 +75,7 @@ public class QuizServlet extends HttpServlet {
             boolean userAnswerExists = true;
             if (attribute != null) {
                 userAnswer = (String) attribute;
-                System.out.println(userAnswer);
+                logger.info(userAnswer);
             } else {
                 userAnswerExists = false;
             }
@@ -273,12 +277,12 @@ public class QuizServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String userAnswer = req.getParameter("options");
-        System.out.println("userAnswer " + userAnswer);
+        logger.info("userAnswer {}", userAnswer);
         HttpSession session = req.getSession(false);
         Set<String> correctIds = (Set<String>) session.getAttribute("correctIds");
         boolean isUserAnswerCorrect = correctIds.contains(userAnswer);
 
-        System.out.println("isUserAnswerCorrect " + isUserAnswerCorrect);
+        logger.info("isUserAnswerCorrect {}", isUserAnswerCorrect);
         if (isUserAnswerCorrect) {
             session.setAttribute("score", 1);
             session.setAttribute("userAnswerStatus", "Correct");
@@ -303,23 +307,23 @@ public class QuizServlet extends HttpServlet {
                 }
                 checkedList.add(currentPage - 1, Integer.parseInt(split[1]) - subtractAmount);
 
-                System.out.println("attributeScoreList size " + attributeScoreList.size());
-                System.out.println("currentPage - 1 " + (currentPage - 1));
+                logger.info("attributeScoreList size {}", attributeScoreList.size());
+                logger.info("currentPage - 1 {}", (currentPage - 1));
                 try {
-                    System.out.println(">>>>>>>>>>>>>> before");
+                    logger.info(">>>>>>>>>>>>>> before");
                     attributeScoreList.set(currentPage - 1, score);
-                    System.out.println(">>>>>>>>>>>>>> after");
+                    logger.info(">>>>>>>>>>>>>> after");
                 } catch (Exception e) {
-                    System.out.println("Ignore >>>>>>>>>>>>>>>>>>>>>>>>>>>> exception " + e.getMessage());
+                    logger.error("Ignore >>>>>>>>>>>>>>>>>>>>>>>>>>>> exception {}", e.getMessage());
                 }
 
-                System.out.println("Attribute Score List: ");
+                logger.info("Attribute Score List: ");
                 for (Integer i : attributeScoreList) {
-                    System.out.println(i);
+                    logger.info(i);
                 }
-                System.out.println("\n\nChecked List: ");
+                logger.info("\nChecked List: ");
                 for (Integer s : checkedList) {
-                    System.out.println(s);
+                    logger.info(s);
                 }
             }
             session.setAttribute("checkedList", checkedList);

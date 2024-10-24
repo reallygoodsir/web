@@ -1,5 +1,9 @@
 package org.servlets.servlets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.servlets.dao.UsersDAO;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,14 +12,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class AdminServlet extends HttpServlet {
+    private static final Logger logger = LogManager.getLogger(AdminServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PrintWriter writer = resp.getWriter();
-        StringBuilder html = new StringBuilder();
         HttpSession session = req.getSession(false);
         if (session == null) {
-            System.out.println("No session. Return login page.");
-            html.append("<!DOCTYPE html>\n" +
+            logger.info("No session. Return login page.");
+            String html = "<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
                     "    <meta charset=\"UTF-8\">\n" +
@@ -84,15 +87,31 @@ public class AdminServlet extends HttpServlet {
                     "        </form>\n" +
                     "    </div>\n" +
                     "</body>\n" +
-                    "</html>\n");
+                    "</html>\n";
+            PrintWriter writer = resp.getWriter();
             writer.println(html);
+            writer.flush();
+            writer.close();
+        } else {
+            logger.info("Session exists. Navigate to questions page.");
+            resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
         }
-        writer.flush();
-        writer.close();
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
+        String userName = req.getParameter("username");
+        String password = req.getParameter("password");
+        UsersDAO usersDAO = new UsersDAO();
+        boolean isValid = usersDAO.validate(userName, password);
+        if (isValid) {
+            HttpSession session = req.getSession(true);
+            if (session == null) {
+                logger.info("Could not create session");
+            } else {
+                logger.info("Session created with id {}", session.getId());
+                resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
+            }
+        }
     }
 }
