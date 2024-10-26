@@ -45,7 +45,7 @@ public class AddServlet extends HttpServlet {
                 "            border-radius: 10px;\n" +
                 "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
                 "            width: 100%;\n" +
-                "            max-width: 500px;\n" +
+                "            max-width: 1000px;\n" +
                 "        }\n" +
                 "\n" +
                 "        .form-container h2 {\n" +
@@ -82,27 +82,43 @@ public class AddServlet extends HttpServlet {
                 "            color: #333;\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container button {\n" +
-                "            width: 100%;\n" +
-                "            padding: 10px;\n" +
-                "            margin-top: 20px;\n" +
-                "            background: #4CAF50;\n" +
-                "            color: #fff;\n" +
-                "            border: none;\n" +
-                "            border-radius: 5px;\n" +
-                "            font-size: 16px;\n" +
-                "            cursor: pointer;\n" +
-                "            transition: background 0.3s ease;\n" +
+                "        .button-container {\n" +
+                "            display: flex;\n" +
+                "            justify-content: space-between; /* Align buttons to opposite sides */\n" +
+                "            margin-top: 20px; /* Adds some space above the buttons */\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container button:hover {\n" +
-                "            background: #45a049;\n" +
+                "        .button-container button {\n" +
+                "            width: 48%; /* Set a width for both buttons to make them the same size */\n" +
+                "            padding: 10px; /* Ensure both buttons have the same padding */\n" +
+                "            border: none; /* Remove border */\n" +
+                "            border-radius: 5px; /* Match border radius */\n" +
+                "            font-size: 16px; /* Font size */\n" +
+                "            cursor: pointer; /* Change cursor to pointer */\n" +
+                "            transition: background 0.3s ease; /* Transition for hover effect */\n" +
+                "        }\n" +
+                "\n" +
+                "        .button-add {\n" +
+                "            background: #4CAF50; /* Green background for the Add button */\n" +
+                "            color: #fff; /* White text color for contrast */\n" +
+                "        }\n" +
+                "\n" +
+                "        .button-add:hover {\n" +
+                "            background: #45a049; /* Darker green on hover for Add button */\n" +
+                "        }\n" +
+                "\n" +
+                "        .button-return {\n" +
+                "            background: #dc3545; /* Set the background color to red for Return button */\n" +
+                "            color: #fff; /* Set the text color to white for contrast */\n" +
+                "        }\n" +
+                "\n" +
+                "        .button-return:hover {\n" +
+                "            background: #c82333; /* Darker red on hover */\n" +
                 "        }\n" +
                 "    </style>\n" +
                 "</head>\n" +
                 "<body>\n" +
                 "    <div class=\"form-container\">\n" +
-                "<button class=\"button button-return\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>" +
                 "        <h2>Add Question</h2>\n" +
                 "        <form method=\"POST\">\n" +
                 "            <label for=\"question\">Question</label>\n" +
@@ -120,7 +136,10 @@ public class AddServlet extends HttpServlet {
         }
 
         html.append("\n" +
-                "            <button type=\"submit\">Add Question</button>\n" +
+                "<div class=\"button-container\">\n" +
+                "            <button class=\"button-add\" type=\"submit\">Add</button>\n" +
+                "<button class=\"button button-return\" type=\"button\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>" +
+                "</div>\n" +
                 "        </form>\n" +
                 "    </div>\n" +
                 "</body>\n" +

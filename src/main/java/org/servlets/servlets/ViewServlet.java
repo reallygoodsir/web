@@ -49,7 +49,7 @@ public class ViewServlet extends HttpServlet {
                     "            background-color: #ffffff;\n" +
                     "            padding: 20px;\n" +
                     "            border-radius: 8px;\n" +
-                    "            max-width: 600px;\n" +
+                    "            max-width: 1000px;\n" +
                     "            margin: 0 auto;\n" +
                     "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
                     "        }\n" +
@@ -60,27 +60,39 @@ public class ViewServlet extends HttpServlet {
                     "            margin-bottom: 20px;\n" +
                     "        }\n" +
                     "\n" +
-                    "        .form-group {\n" +
-                    "            margin-bottom: 15px;\n" +
-                    "        }\n" +
+                    ".form-group {\n" +
+                            "    width: 100%; /* Make sure the form group takes full width */\n" +
+                            "}\n" +
+                            "\n" +
+                            ".auto-expand {\n" +
+                            "    width: 100%; \n" +
+                            "    padding: 10px; \n" +
+                            "    border: 1px solid #ddd; \n" +
+                            "    border-radius: 5px; \n" +
+                            "    box-sizing: border-box; \n" +
+                            "    resize: vertical; /* Allow vertical resizing */\n" +
+                            "    min-height: 50px; /* Set a minimum height */\n" +
+                            "    overflow: hidden; /* Prevent overflow from showing scrollbars */\n" +
+                            "    line-height: 1.5; /* Set line height for better readability */\n" +
+                            "    font-family: inherit; /* Ensure consistent font with the rest of the form */\n" +
+                            "    font-size: inherit; /* Ensure font size consistency */\n" +
+                            "}\n" +
                     "\n" +
-                    "        .form-group label {\n" +
-                    "            display: block;\n" +
-                    "            font-weight: bold;\n" +
-                    "            margin-bottom: 5px;\n" +
-                    "        }\n" +
+                    ".form-group label {\n" +
+                    "    display: block;\n" +
+                    "    font-weight: bold;\n" +
+                    "    margin-bottom: 5px;\n" +
+                    "    color: #333; /* Color for labels */\n" +
+                    "    font-size: 1.1em; /* Make labels slightly larger */\n" +
+                    "}\n" +
                     "\n" +
                     ".form-group textarea,\n" +
                     ".form-group select {\n" +
-                    "    width: 100%;\n" +
-                    "    padding: 10px;\n" +
-                    "    border: 1px solid #ddd;\n" +
-                    "    border-radius: 5px;\n" +
-                    "    box-sizing: border-box;\n" +
-                    "    resize: vertical;\n" +
-                    "    height: auto;\n" +
-                    "    min-height: 100px; /* Set a minimum height */\n" +
-                    "    overflow: hidden; /* Prevent scrollbars from appearing */\n" +
+                    "    width: 100%; \n" +
+                    "    padding: 10px; \n" +
+                    "    border: 1px solid #ddd; \n" +
+                    "    border-radius: 5px; \n" +
+                    "    box-sizing: border-box; \n" +
                     "}\n" +
                     "        .form-group textarea:focus,\n" +
                     "        .form-group select:focus {\n" +
@@ -88,9 +100,31 @@ public class ViewServlet extends HttpServlet {
                     "            outline: none;\n" +
                     "        }\n" +
                     "\n" +
+                    ".is-correct-label {\n" +
+                    "            font-weight: bold;\n" +
+                    "            color: #555;\n" +
+                    "            margin-top: 10px;\n" +
+                    "        }\n" +
+                    "\n" +
+                    ".is-correct-select {\n" +
+                    "    width: 100%;\n" +
+                    "    padding: 5px; /* Reduce padding to make the dropdown smaller */\n" +
+                    "    border: 1px solid #ddd;\n" +
+                    "    border-radius: 5px;\n" +
+                    "    box-sizing: border-box;\n" +
+                    "    max-height: 50px;\n" +
+                    "    background-color: #f9f9f9;\n" +
+                    "    color: #333;\n" +
+                    "    font-weight: normal;\n" +
+                    "    line-height: 1.2; /* Decrease line-height to reduce the height of the options */\n" +
+                    "}\n" +
+                    "        .is-correct-select:focus {\n" +
+                    "            border-color: #007BFF;\n" +
+                    "            outline: none;\n" +
+                    "        }\n" +
                     "        .form-actions {\n" +
                     "            display: flex;\n" +
-                    "            justify-content: space-between;\n" +
+                    "            justify-content: flex-end  ;\n" +
                     "            margin-top: 20px;\n" +
                     "        }\n" +
                     "\n" +
@@ -139,9 +173,9 @@ public class ViewServlet extends HttpServlet {
                 int answerIndex = i + 1;
                 html.append("            <div class=\"form-group\">\n" +
                         "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
-                        "                <textarea id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" disabled>" + answer.getName() + "</textarea>\n" +
-                        "                <label for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
-                        "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" disabled>\n");
+                        "                <textarea id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
+                        "                <label class=\"is-correct-label\" for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
+                        "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" class=\"is-correct-select\" disabled>\n");
                 if (isCorrect) {
                     html.append("                    <option value=\"true\" selected>True</option>\n");
                     html.append("                    <option value=\"false\">False</option>\n");

@@ -10,11 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class QuizServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(QuizServlet.class);
@@ -27,6 +25,7 @@ public class QuizServlet extends HttpServlet {
             if (session.isNew()) {
                 QuestionsDAO questionsDAO = new QuestionsDAO();
                 List<Question> questions = questionsDAO.getQuestions();
+                Collections.shuffle(questions);
                 session.setAttribute("questions", questions);
 
                 Set<String> correctIds = new HashSet<>();
@@ -223,7 +222,6 @@ public class QuizServlet extends HttpServlet {
             Question question = questions.get(currentPage - 1);
             List<Answer> answers = question.getAnswers();
             html.append("<h2>").append(question.getName()).append("</h2>\n").append("<form method=\"POST\">\n");
-
             for (int i = 0; i < answers.size(); i++) {
                 Answer answer = answers.get(i);
                 html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + QUESTION_ANSWER_DELIMITER + answer.getId() + "\"");
@@ -265,7 +263,6 @@ public class QuizServlet extends HttpServlet {
                     "    </div>\n" +
                     "</body>\n" +
                     "</html>\n");
-
             session.removeAttribute("userAnswerStatus");
 
             PrintWriter writer = resp.getWriter();
@@ -317,7 +314,7 @@ public class QuizServlet extends HttpServlet {
                 }
                 logger.info("\nChecked List: ");
                 for (Integer s : checkedList) {
-                    logger.info(s);
+                    logger.info("Checked list Value: " + s);
                 }
             }
             session.setAttribute("checkedList", checkedList);

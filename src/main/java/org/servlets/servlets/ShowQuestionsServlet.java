@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShowQuestionsServlet extends HttpServlet {
@@ -18,13 +19,40 @@ public class ShowQuestionsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String page = req.getParameter("page");
+        if (page == null) {
+            page = "1";
+        }
+        int currentPage = Integer.parseInt(page);
+        int nextPage = currentPage + 1;
+        int previousPage = currentPage - 1;
+
+        int beginning = 0; // change that name
+        for (int i = 1; i < currentPage; i++) {
+            beginning += 8; // 8 questions a page
+        }
         QuestionsDAO questionsDAO = new QuestionsDAO();
-        List<Question> questions;
+        List<Question> questions = new ArrayList<>();
+
         try {
-            questions = questionsDAO.getQuestions();
+            List<Question> temporaryQuestions = questionsDAO.getQuestions();
+            int amountToAdd = 8; // change the name
+            if (beginning == 0) {
+                amountToAdd -= 1;
+            }
+            for (int i = beginning; i <= beginning + amountToAdd && i < temporaryQuestions.size(); i++) {
+                Question question = temporaryQuestions.get(i);
+                if (question == null) {
+                    break;
+                }
+                questions.add(question);
+            }
         } catch (SQLException e) {
             logger.error("Error occurred getting questions from db.", e);
             throw new RuntimeException(e);
+        }
+        if (questions.size() == 0) {
+            resp.sendRedirect("http://localhost:8080/servlets-quiz/questions?page=" + previousPage);
         }
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html>\n" +
@@ -82,6 +110,29 @@ public class ShowQuestionsServlet extends HttpServlet {
                 "            background-color: #218838; /* Darker shade on hover */\n" +
                 "        }\n" +
                 "\n" +
+                "        .pagination-container {\n" +
+                "            margin-top: 20px; /* Space between the table and pagination */\n" +
+                "            display: flex; /* Use flexbox for alignment */\n" +
+                "            justify-content: center; /* Center the buttons */\n" +
+                "        }\n" +
+                "\n" +
+                "        .pagination-button {\n" +
+                "            padding: 10px 16px; /* More padding for height */\n" +
+                "            border: none;\n" +
+                "            border-radius: 5px;\n" +
+                "            cursor: pointer;\n" +
+                "            font-size: 14px;\n" +
+                "            background-color: #007BFF; /* Blue color for pagination buttons */\n" +
+                "            color: white;\n" +
+                "            white-space: nowrap;\n" +
+                "            margin: 0 5px; /* Space between buttons */\n" +
+                "            transition: background-color 0.3s;\n" +
+                "        }\n" +
+                "\n" +
+                "        .pagination-button:hover {\n" +
+                "            background-color: #0056b3; /* Darker shade on hover */\n" +
+                "        }\n" +
+                "\n" +
                 "        @media (max-width: 768px) {\n" +
                 "            table {\n" +
                 "                display: block;\n" +
@@ -95,8 +146,7 @@ public class ShowQuestionsServlet extends HttpServlet {
                 "            }\n" +
                 "        }\n" +
                 "    </style>\n" +
-                "</head>\n" +
-                "<body>\n" +
+                "</head>" +
                 "    <h2>Questions</h2>\n" +
                 "<button class=\"button button-edit\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions/add'\">Add Question</button>" +
                 "    <table>\n" +
@@ -108,10 +158,10 @@ public class ShowQuestionsServlet extends HttpServlet {
                 "            </tr>\n" +
                 "        </thead>\n" +
                 "        <tbody>\n");
-        for (int i = 0; i < questions.size(); i++) {
+        for (int i = 0, i2 = beginning; i < questions.size(); i++, i2++) {
             Question question = questions.get(i);
             html.append("            <tr>\n" +
-                    "                <td>" + (i + 1) + "</td>\n" +
+                    "                <td>" + (i2 + 1) + "</td>\n" +
                     "                <td>" + question.getName() + "</td>\n" +
                     "                <td>\n" +
                     "                    <button class=\"button\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions/view?id=" + question.getId() + "'\">View</button>\n" +
@@ -122,6 +172,12 @@ public class ShowQuestionsServlet extends HttpServlet {
         }
         html.append("        </tbody>\n" +
                 "    </table>\n" +
+                "    <div class=\"pagination-container\">\n");
+        if (currentPage != 1) {
+            html.append("        <button class=\"pagination-button\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions?page=" + previousPage + "'\">Previous</button>\n");
+        }
+        html.append("        <button class=\"pagination-button\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions?page=" + nextPage + "'\">Next</button>\n");
+        html.append("    </div>\n" +
                 "</body>\n" +
                 "</html>\n");
 

@@ -49,7 +49,7 @@ public class EditServlet extends HttpServlet {
                     "            background-color: #ffffff;\n" +
                     "            padding: 20px;\n" +
                     "            border-radius: 8px;\n" +
-                    "            max-width: 600px;\n" +
+                    "            max-width: 1000px;\n" +
                     "            margin: 0 auto;\n" +
                     "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
                     "        }\n" +
