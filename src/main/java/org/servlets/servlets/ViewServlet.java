@@ -70,27 +70,18 @@ public class ViewServlet extends HttpServlet {
                     "            margin-bottom: 5px;\n" +
                     "        }\n" +
                     "\n" +
-                    "        .form-group textarea,\n" +
-                    "        .form-group select {\n" +
-                    "            width: 100%;\n" +
-                    "            padding: 10px;\n" +
-                    "            border: 1px solid #ddd;\n" +
-                    "            border-radius: 5px;\n" +
-                    "            box-sizing: border-box;\n" +
-                    "            resize: vertical; /* Allow users to resize the height */\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .form-group textarea {\n" +
-                    "            min-height: 50px;\n" +
-                    "            max-height: 200px;\n" +
-                    "            line-height: 1.5;\n" +
-                    "            overflow: auto;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .form-group select {\n" +
-                    "            padding: 9px;\n" +
-                    "        }\n" +
-                    "\n" +
+                    ".form-group textarea,\n" +
+                    ".form-group select {\n" +
+                    "    width: 100%;\n" +
+                    "    padding: 10px;\n" +
+                    "    border: 1px solid #ddd;\n" +
+                    "    border-radius: 5px;\n" +
+                    "    box-sizing: border-box;\n" +
+                    "    resize: vertical;\n" +
+                    "    height: auto;\n" +
+                    "    min-height: 100px; /* Set a minimum height */\n" +
+                    "    overflow: hidden; /* Prevent scrollbars from appearing */\n" +
+                    "}\n" +
                     "        .form-group textarea:focus,\n" +
                     "        .form-group select:focus {\n" +
                     "            border-color: #007BFF;\n" +

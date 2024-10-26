@@ -17,11 +17,11 @@ import java.util.UUID;
 
 public class AddServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(AddServlet.class);
+    private static final int ANSWERS_COUNT = 3;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         StringBuilder html = new StringBuilder();
-        PrintWriter writer = resp.getWriter();
         html.append("<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -107,33 +107,26 @@ public class AddServlet extends HttpServlet {
                 "        <form method=\"POST\">\n" +
                 "            <label for=\"question\">Question</label>\n" +
                 "            <textarea id=\"question\" name=\"question\" rows=\"4\" placeholder=\"Enter text for Question ...\" required></textarea>\n" +
-                "\n" +
-                "            <label for=\"answerOne\">Answer One</label>\n" +
-                "            <textarea id=\"answerOne\" name=\"answerOne\" rows=\"4\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
-                "            <select id=\"isTrueOne\" name=\"isTrueOne\" required>\n" +
-                "                <option value=\"true\">True</option>\n" +
-                "                <option value=\"false\">False</option>\n" +
-                "            </select>\n" +
-                "\n" +
-                "            <label for=\"answerTwo\">Answer Two</label>\n" +
-                "            <textarea id=\"answerTwo\" name=\"answerTwo\" rows=\"4\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
-                "            <select id=\"isTrueTwo\" name=\"isTrueTwo\" required>\n" +
-                "                <option value=\"true\">True</option>\n" +
-                "                <option value=\"false\">False</option>\n" +
-                "            </select>\n" +
-                "\n" +
-                "            <label for=\"answerThree\">Answer Three</label>\n" +
-                "            <textarea id=\"answerThree\" name=\"answerThree\" rows=\"4\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
-                "            <select id=\"isTrueThree\" name=\"isTrueThree\" required>\n" +
-                "                <option value=\"true\">True</option>\n" +
-                "                <option value=\"false\">False</option>\n" +
-                "            </select>\n" +
-                "\n" +
+                "\n");
+
+        for (int i = 1; i <= ANSWERS_COUNT; i++) {
+            html.append("            <label for=\"answer" + i + "\">Answer " + i + "</label>\n" +
+                    "            <textarea id=\"answer" + i + "\" name=\"answer" + i + "\" rows=\"4\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
+                    "            <select id=\"isTrue" + i + "\" name=\"isTrue" + i + "\" required>\n" +
+                    "                <option value=\"true\">True</option>\n" +
+                    "                <option value=\"false\">False</option>\n" +
+                    "            </select>\n");
+
+        }
+
+        html.append("\n" +
                 "            <button type=\"submit\">Add Question</button>\n" +
                 "        </form>\n" +
                 "    </div>\n" +
                 "</body>\n" +
                 "</html>\n");
+
+        PrintWriter writer = resp.getWriter();
         writer.println(html);
     }
 
@@ -141,21 +134,18 @@ public class AddServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             logger.info("Start adding question");
-            Answer firstAnswer = new Answer(UUID.randomUUID().toString(), req.getParameter("answerOne"),
-                    Boolean.parseBoolean(req.getParameter("isTrueOne")));
-            Answer secondAnswer = new Answer(UUID.randomUUID().toString(), req.getParameter("answerTwo"),
-                    Boolean.parseBoolean(req.getParameter("isTrueTwo")));
-            Answer thirdAnswer = new Answer(UUID.randomUUID().toString(), req.getParameter("answerThree"),
-                    Boolean.parseBoolean(req.getParameter("isTrueThree")));
-
             List<Answer> answers = new ArrayList<>();
-            answers.add(firstAnswer);
-            answers.add(secondAnswer);
-            answers.add(thirdAnswer);
+            for (int i = 1; i <= ANSWERS_COUNT; i++) {
+                String answerId = UUID.randomUUID().toString();
+                String answerName = req.getParameter("answer" + i);
+                boolean answerIsCorrect = Boolean.parseBoolean(req.getParameter("isTrue" + i));
+                Answer answer = new Answer(answerId, answerName, answerIsCorrect);
+                answers.add(answer);
+            }
 
-            UUID questionId = UUID.randomUUID();
+            String questionId = UUID.randomUUID().toString();
             String questionName = req.getParameter("question");
-            Question question = new Question(questionId.toString(), questionName);
+            Question question = new Question(questionId, questionName);
             question.setAnswers(answers);
 
             QuestionsDAO questionsDAO = new QuestionsDAO();

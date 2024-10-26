@@ -18,6 +18,7 @@ import java.util.Set;
 
 public class QuizServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(QuizServlet.class);
+    private static final String QUESTION_ANSWER_DELIMITER = ":";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -35,7 +36,7 @@ public class QuizServlet extends HttpServlet {
                     for (Answer answer : answers) {
                         if (answer.getIsCorrect()) {
                             String answerId = answer.getId();
-                            correctIds.add(questionId + "-" + answerId);
+                            correctIds.add(questionId + QUESTION_ANSWER_DELIMITER + answerId);
                         }
                     }
                 }
@@ -225,7 +226,7 @@ public class QuizServlet extends HttpServlet {
 
             for (int i = 0; i < answers.size(); i++) {
                 Answer answer = answers.get(i);
-                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + "-" + answer.getId() + "\"");
+                html.append("<input type=\"radio\" id=\"option" + (i + 1) + "\" name=\"options\" value=\"" + question.getId() + QUESTION_ANSWER_DELIMITER + answer.getId() + "\"");
                 if (!(scoreList.get(currentPage - 1) == (-1))) {
                     html.append("disabled");
                 }
@@ -298,14 +299,7 @@ public class QuizServlet extends HttpServlet {
             Integer score = (Integer) session.getAttribute("score");
             if (score != null) {
                 Integer currentPage = (Integer) session.getAttribute("currentPage");
-
-                String[] split = userAnswer.split("-");
-
-                Integer subtractAmount = 1;
-                for (int i = 1; i < currentPage; i++) {
-                    subtractAmount += 3;
-                }
-                checkedList.add(currentPage - 1, Integer.parseInt(split[1]) - subtractAmount);
+                checkedList.add(currentPage - 1, isUserAnswerCorrect ? 1 : 0);
 
                 logger.info("attributeScoreList size {}", attributeScoreList.size());
                 logger.info("currentPage - 1 {}", (currentPage - 1));
