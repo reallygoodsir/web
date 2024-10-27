@@ -1,3 +1,4 @@
+use servlets-db;
 -- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
 --
 -- Host: localhost    Database: servlets-db
