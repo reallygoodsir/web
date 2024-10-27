@@ -27,124 +27,134 @@ public class AddServlet extends HttpServlet {
                 "<head>\n" +
                 "    <meta charset=\"UTF-8\">\n" +
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "    <title>Quiz Admin Panel</title>\n" +
+                "    <title>Edit Question</title>\n" +
                 "    <style>\n" +
                 "        body {\n" +
-                "            background: #f0f2f5;\n" +
-                "            display: flex;\n" +
-                "            justify-content: center;\n" +
-                "            align-items: center;\n" +
-                "            height: 100vh;\n" +
-                "            font-family: 'Arial', sans-serif;\n" +
-                "            margin: 0;\n" +
+                "            font-family: Arial, sans-serif;\n" +
+                "            background-color: #f4f4f4;\n" +
+                "            padding: 20px;\n" +
+                "            box-sizing: border-box;\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container {\n" +
-                "            background: #fff;\n" +
-                "            padding: 20px 30px;\n" +
-                "            border-radius: 10px;\n" +
-                "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
-                "            width: 100%;\n" +
+                "        .container {\n" +
+                "            background-color: #ffffff;\n" +
+                "            padding: 20px;\n" +
+                "            border-radius: 8px;\n" +
                 "            max-width: 1000px;\n" +
+                "            margin: 0 auto;\n" +
+                "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container h2 {\n" +
+                "        h2 {\n" +
                 "            text-align: center;\n" +
+                "            color: #333;\n" +
                 "            margin-bottom: 20px;\n" +
-                "            color: #333;\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container label {\n" +
+                "        .form-group {\n" +
+                "            margin-bottom: 15px;\n" +
+                "        }\n" +
+                "\n" +
+                "        .form-group label {\n" +
                 "            display: block;\n" +
-                "            margin-top: 15px;\n" +
-                "            margin-bottom: 5px;\n" +
                 "            font-weight: bold;\n" +
-                "            color: #555;\n" +
+                "            margin-bottom: 5px;\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container textarea {\n" +
+                "        .form-group textarea,\n" +
+                "        .form-group select {\n" +
                 "            width: 100%;\n" +
                 "            padding: 10px;\n" +
                 "            border: 1px solid #ddd;\n" +
                 "            border-radius: 5px;\n" +
                 "            box-sizing: border-box;\n" +
-                "            resize: vertical;\n" +
+                "            resize: vertical; /* Allow users to resize the height */\n" +
                 "        }\n" +
                 "\n" +
-                "        .form-container select {\n" +
-                "            width: 100%;\n" +
-                "            padding: 10px;\n" +
-                "            margin-top: 10px;\n" +
-                "            border: 1px solid #ddd;\n" +
-                "            border-radius: 5px;\n" +
-                "            box-sizing: border-box;\n" +
-                "            background: #fff;\n" +
-                "            color: #333;\n" +
+                "        .form-group textarea {\n" +
+                "            min-height: 50px;\n" +
+                "            max-height: 200px;\n" +
+                "            line-height: 1.5;\n" +
+                "            overflow: auto;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-container {\n" +
+                "        .form-group select {\n" +
+                "            padding: 9px;\n" +
+                "        }\n" +
+                "\n" +
+                "        .form-group textarea:focus,\n" +
+                "        .form-group select:focus {\n" +
+                "            border-color: #007BFF;\n" +
+                "            outline: none;\n" +
+                "        }\n" +
+                "\n" +
+                "        .form-actions {\n" +
                 "            display: flex;\n" +
-                "            justify-content: space-between; /* Align buttons to opposite sides */\n" +
-                "            margin-top: 20px; /* Adds some space above the buttons */\n" +
+                "            justify-content: space-between;\n" +
+                "            margin-top: 20px;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-container button {\n" +
-                "            width: 48%; /* Set a width for both buttons to make them the same size */\n" +
-                "            padding: 10px; /* Ensure both buttons have the same padding */\n" +
-                "            border: none; /* Remove border */\n" +
-                "            border-radius: 5px; /* Match border radius */\n" +
-                "            font-size: 16px; /* Font size */\n" +
-                "            cursor: pointer; /* Change cursor to pointer */\n" +
-                "            transition: background 0.3s ease; /* Transition for hover effect */\n" +
+                "        .button {\n" +
+                "            padding: 10px 15px;\n" +
+                "            border: none;\n" +
+                "            border-radius: 5px;\n" +
+                "            cursor: pointer;\n" +
+                "            font-size: 16px;\n" +
+                "            transition: background-color 0.3s;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-add {\n" +
-                "            background: #4CAF50; /* Green background for the Add button */\n" +
-                "            color: #fff; /* White text color for contrast */\n" +
+                "        .button-save {\n" +
+                "            background-color: #28a745;\n" +
+                "            color: white;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-add:hover {\n" +
-                "            background: #45a049; /* Darker green on hover for Add button */\n" +
+                "        .button-cancel {\n" +
+                "            background-color: #dc3545;\n" +
+                "            color: white;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-return {\n" +
-                "            background: #dc3545; /* Set the background color to red for Return button */\n" +
-                "            color: #fff; /* Set the text color to white for contrast */\n" +
+                "        .button-save:hover {\n" +
+                "            background-color: #218838;\n" +
                 "        }\n" +
                 "\n" +
-                "        .button-return:hover {\n" +
-                "            background: #c82333; /* Darker red on hover */\n" +
+                "        .button-cancel:hover {\n" +
+                "            background-color: #c82333;\n" +
                 "        }\n" +
                 "    </style>\n" +
                 "</head>\n" +
-                "<body>\n" +
-                "    <div class=\"form-container\">\n" +
+                "<body>\n");
+
+        html.append("    <div class=\"container\">\n" +
                 "        <h2>Add Question</h2>\n" +
-                "        <form method=\"POST\">\n" +
-                "            <label for=\"question\">Question</label>\n" +
-                "            <textarea id=\"question\" name=\"question\" rows=\"4\" placeholder=\"Enter text for Question ...\" required></textarea>\n" +
+                "        <form action=\"\" method=\"POST\">\n" +
+                "            <div class=\"form-group\">\n" +
+                "                <label for=\"question\">Question:</label>\n" +
+                "                <textarea id=\"question\" name=\"question\" placeholder=\"Enter text for Question ...\" required></textarea>\n" +
+                "            </div>\n" +
                 "\n");
-
         for (int i = 1; i <= ANSWERS_COUNT; i++) {
-            html.append("            <label for=\"answer" + i + "\">Answer " + i + "</label>\n" +
-                    "            <textarea id=\"answer" + i + "\" name=\"answer" + i + "\" rows=\"4\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
-                    "            <select id=\"isTrue" + i + "\" name=\"isTrue" + i + "\" required>\n" +
-                    "                <option value=\"true\">True</option>\n" +
-                    "                <option value=\"false\">False</option>\n" +
-                    "            </select>\n");
-
+            html.append("        <div class=\"form-group\">\n" +
+                    "                <label for=\"answer" + i + "\">Answer " + i + ":</label>\n" +
+                    "                <textarea id=\"answer" + i + "\" name=\"answer" + i + "\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
+                    "                <label for=\"isTrue" + i + "\">Is Correct:</label>\n" +
+                    "                <select id=\"isTrue" + i + "\" name=\"isTrue" + i + "\" required>\n" +
+                    "                    <option value=\"true\" selected>True</option>\n" +
+                    "                    <option value=\"false\">False</option>\n" +
+                    "                </select>\n" +
+                    "            </div>\n" +
+                    "\n");
         }
 
-        html.append("\n" +
-                "<div class=\"button-container\">\n" +
-                "            <button class=\"button-add\" type=\"submit\">Add</button>\n" +
-                "<button class=\"button button-return\" type=\"button\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>" +
-                "</div>\n" +
-                "        </form>\n" +
+        html.append("         <div class=\"form-actions\">\n" +
+                "                <button type=\"submit\" class=\"button button-save\">Save</button>\n" +
+                "                <button type=\"button\" class=\"button button-cancel\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Cancel</button>\n" +
+                "            </div>\n");
+
+
+        html.append("        </form>\n" +
                 "    </div>\n" +
                 "</body>\n" +
                 "</html>\n");
-
         PrintWriter writer = resp.getWriter();
         writer.println(html);
     }

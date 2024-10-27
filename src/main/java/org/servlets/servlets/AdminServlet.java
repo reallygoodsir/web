@@ -4,21 +4,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.servlets.dao.UsersDAO;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class AdminServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(AdminServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
             logger.info("No session. Return login page.");
-            String html = "<!DOCTYPE html>\n" +
+            StringBuilder html = new StringBuilder();
+            html.append("<!DOCTYPE html>\n" +
                     "<html lang=\"en\">\n" +
                     "<head>\n" +
                     "    <meta charset=\"UTF-8\">\n" +
@@ -50,6 +49,14 @@ public class AdminServlet extends HttpServlet {
                     "            color: #333;\n" +
                     "        }\n" +
                     "\n" +
+                    "        .error-message {\n" +
+                    "            color: #d8000c;\n" +
+                    "            background-color: #ffd2d2;\n" +
+                    "            padding: 10px;\n" +
+                    "            border-radius: 5px;\n" +
+                    "            margin-bottom: 20px;\n" +
+                    "        }\n" +
+                    "\n" +
                     "        .login-container input[type=\"text\"],\n" +
                     "        .login-container input[type=\"password\"] {\n" +
                     "            width: 100%;\n" +
@@ -77,9 +84,28 @@ public class AdminServlet extends HttpServlet {
                     "        }\n" +
                     "    </style>\n" +
                     "</head>\n" +
-                    "<body>\n" +
-                    "    <div class=\"login-container\">\n" +
-                    "        <h2>Login</h2>\n" +
+                    "<body>\n");
+            html.append("    <div class=\"login-container\">\n");
+
+            String errorCredentials = (String) req.getAttribute("errorCredentials");
+            System.out.println("ATTRIBUTE:" + errorCredentials);
+            if(errorCredentials != null && !errorCredentials.isEmpty()) {
+                if (errorCredentials.equalsIgnoreCase("errorCredentials")) {
+                    System.out.println("entered the append");
+                    html.append("        <div class=\"error-message\" id=\"error-message\">\n" +
+                            "            You entered an incorrect username or password. Please try again.\n" +
+                            "        </div>\n");
+                }
+            }
+
+//            String header = req.getHeader("errorMessage");
+//            System.out.println("\n\n\n\n\n\n" + header + "\n\n\n\n\n\n");
+//            if("incorrect credentials".equalsIgnoreCase(header)) {
+//                html.append("        <div class=\"error-message\" id=\"error-message\" style=\"display: none;\">\n" +
+//                        "            You entered an incorrect username or password. Please try again.\n" +
+//                        "        </div>\n");
+//            }
+            html.append("        <h2>Login</h2>\n" +
                     "        <form method=\"POST\">\n" +
                     "            <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Enter your username\" required>\n" +
                     "            <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Enter your password\" required>\n" +
@@ -87,7 +113,7 @@ public class AdminServlet extends HttpServlet {
                     "        </form>\n" +
                     "    </div>\n" +
                     "</body>\n" +
-                    "</html>\n";
+                    "</html>\n");
             PrintWriter writer = resp.getWriter();
             writer.println(html);
             writer.flush();
@@ -112,6 +138,9 @@ public class AdminServlet extends HttpServlet {
                 logger.info("Session created with id {}", session.getId());
                 resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
             }
+        } else {
+            req.setAttribute("errorCredentials", "errorCredentials");
+            doGet(req, resp);
         }
     }
 }
