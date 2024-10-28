@@ -18,10 +18,5 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Root>
-
-        <!-- Example of a specific logger for custom logging in a package -->
-        <Logger name="org.servlets" level="debug" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
     </Loggers>
 </Configuration>
