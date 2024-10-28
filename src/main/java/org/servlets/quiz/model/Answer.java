@@ -1,4 +1,4 @@
-package org.servlets.model;
+package org.servlets.quiz.model;
 
 public class Answer {
     private String id;
@@ -7,11 +7,6 @@ public class Answer {
     private String questionId;
 
     public Answer() {
-    }
-
-    public Answer(String name, boolean isCorrect) {
-        this.name = name;
-        this.isCorrect = isCorrect;
     }
 
     public Answer(String id, String name, boolean isCorrect) {

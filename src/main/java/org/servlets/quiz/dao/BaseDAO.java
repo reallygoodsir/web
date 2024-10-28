@@ -1,4 +1,4 @@
-package org.servlets.dao;
+package org.servlets.quiz.dao;
 
 public abstract class BaseDAO {
     protected final static String DB_URL = System.getenv("SERVLETS_DB_URL");

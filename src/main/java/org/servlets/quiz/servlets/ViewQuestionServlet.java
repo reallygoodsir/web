@@ -1,10 +1,10 @@
-package org.servlets.servlets;
+package org.servlets.quiz.servlets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.servlets.dao.QuestionsDAO;
-import org.servlets.model.Answer;
-import org.servlets.model.Question;
+import org.servlets.quiz.dao.QuestionsDAO;
+import org.servlets.quiz.model.Answer;
+import org.servlets.quiz.model.Question;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class EditServlet extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(EditServlet.class);
+public class ViewQuestionServlet extends HttpServlet {
+    private static final Logger LOGGER = LogManager.getLogger(ViewQuestionServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,6 +27,7 @@ public class EditServlet extends HttpServlet {
             session.setAttribute("questionId", questionId);
 
             if (questionId == null) {
+                LOGGER.error("Expected to have question id in session but was not found.");
                 resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
             } else {
                 QuestionsDAO questionsDAO = new QuestionsDAO();
@@ -62,46 +63,71 @@ public class EditServlet extends HttpServlet {
                         "            margin-bottom: 20px;\n" +
                         "        }\n" +
                         "\n" +
-                        "        .form-group {\n" +
-                        "            margin-bottom: 15px;\n" +
-                        "        }\n" +
+                        ".form-group {\n" +
+                        "    width: 100%; /* Make sure the form group takes full width */\n" +
+                        "}\n" +
                         "\n" +
-                        "        .form-group label {\n" +
-                        "            display: block;\n" +
-                        "            font-weight: bold;\n" +
-                        "            margin-bottom: 5px;\n" +
-                        "        }\n" +
+                        ".auto-expand {\n" +
+                        "    width: 100%; \n" +
+                        "    padding: 10px; \n" +
+                        "    border: 1px solid #ddd; \n" +
+                        "    border-radius: 5px; \n" +
+                        "    box-sizing: border-box; \n" +
+                        "    resize: vertical; /* Allow vertical resizing */\n" +
+                        "    min-height: 50px; /* Set a minimum height */\n" +
+                        "    overflow: hidden; /* Prevent overflow from showing scrollbars */\n" +
+                        "    line-height: 1.5; /* Set line height for better readability */\n" +
+                        "    font-family: inherit; /* Ensure consistent font with the rest of the form */\n" +
+                        "    font-size: inherit; /* Ensure font size consistency */\n" +
+                        "}\n" +
                         "\n" +
-                        "        .form-group textarea,\n" +
-                        "        .form-group select {\n" +
-                        "            width: 100%;\n" +
-                        "            padding: 10px;\n" +
-                        "            border: 1px solid #ddd;\n" +
-                        "            border-radius: 5px;\n" +
-                        "            box-sizing: border-box;\n" +
-                        "            resize: vertical; /* Allow users to resize the height */\n" +
-                        "        }\n" +
+                        ".form-group label {\n" +
+                        "    display: block;\n" +
+                        "    font-weight: bold;\n" +
+                        "    margin-bottom: 5px;\n" +
+                        "    color: #333; /* Color for labels */\n" +
+                        "    font-size: 1.1em; /* Make labels slightly larger */\n" +
+                        "}\n" +
                         "\n" +
-                        "        .form-group textarea {\n" +
-                        "            min-height: 50px;\n" +
-                        "            max-height: 200px;\n" +
-                        "            line-height: 1.5;\n" +
-                        "            overflow: auto;\n" +
-                        "        }\n" +
-                        "\n" +
-                        "        .form-group select {\n" +
-                        "            padding: 9px;\n" +
-                        "        }\n" +
-                        "\n" +
+                        ".form-group textarea,\n" +
+                        ".form-group select {\n" +
+                        "    width: 100%; \n" +
+                        "    padding: 10px; \n" +
+                        "    border: 1px solid #ddd; \n" +
+                        "    border-radius: 5px; \n" +
+                        "    box-sizing: border-box; \n" +
+                        "}\n" +
                         "        .form-group textarea:focus,\n" +
                         "        .form-group select:focus {\n" +
                         "            border-color: #007BFF;\n" +
                         "            outline: none;\n" +
                         "        }\n" +
                         "\n" +
+                        ".is-correct-label {\n" +
+                        "            font-weight: bold;\n" +
+                        "            color: #555;\n" +
+                        "            margin-top: 10px;\n" +
+                        "        }\n" +
+                        "\n" +
+                        ".is-correct-select {\n" +
+                        "    width: 100%;\n" +
+                        "    padding: 5px; /* Reduce padding to make the dropdown smaller */\n" +
+                        "    border: 1px solid #ddd;\n" +
+                        "    border-radius: 5px;\n" +
+                        "    box-sizing: border-box;\n" +
+                        "    max-height: 50px;\n" +
+                        "    background-color: #f9f9f9;\n" +
+                        "    color: #333;\n" +
+                        "    font-weight: normal;\n" +
+                        "    line-height: 1.2; /* Decrease line-height to reduce the height of the options */\n" +
+                        "}\n" +
+                        "        .is-correct-select:focus {\n" +
+                        "            border-color: #007BFF;\n" +
+                        "            outline: none;\n" +
+                        "        }\n" +
                         "        .form-actions {\n" +
                         "            display: flex;\n" +
-                        "            justify-content: space-between;\n" +
+                        "            justify-content: flex-end  ;\n" +
                         "            margin-top: 20px;\n" +
                         "        }\n" +
                         "\n" +
@@ -136,11 +162,11 @@ public class EditServlet extends HttpServlet {
                         "<body>\n");
 
                 html.append("    <div class=\"container\">\n" +
-                        "        <h2>Edit Question</h2>\n" +
+                        "        <h2>View Question</h2>\n" +
                         "        <form action=\"\" method=\"POST\">\n" +
                         "            <div class=\"form-group\">\n" +
                         "                <label for=\"question\">Question:</label>\n" +
-                        "                <textarea id=\"question\" name=\"question\" required>" + question.getName() + "</textarea>\n" +
+                        "                <textarea id=\"question\" name=\"question\" disabled>" + question.getName() + "</textarea>\n" +
                         "            </div>\n" +
                         "\n");
                 List<Answer> answers = question.getAnswers();
@@ -149,10 +175,10 @@ public class EditServlet extends HttpServlet {
                     boolean isCorrect = answer.getIsCorrect();
                     int answerIndex = i + 1;
                     html.append("            <div class=\"form-group\">\n" +
-                            "                <label for=\"answer-" + answer.getId() + "\">Answer " + answerIndex + ":</label>\n" +
-                            "                <textarea rows=\"8\" id=\"answer-" + answer.getId() + "\" name=\"answer-" + answer.getId() + "\" required>" + answer.getName() + "</textarea>\n" +
-                            "                <label for=\"isCorrect-" + answer.getId() + "\">Is Correct:</label>\n" +
-                            "                <select id=\"isCorrect-" + answer.getId() + "\" name=\"isCorrect-" + answer.getId() + "\" required>\n");
+                            "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
+                            "                <textarea rows=\"8\" id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
+                            "                <label class=\"is-correct-label\" for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
+                            "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" class=\"is-correct-select\" disabled>\n");
                     if (isCorrect) {
                         html.append("                    <option value=\"true\" selected>True</option>\n");
                         html.append("                    <option value=\"false\">False</option>\n");
@@ -166,8 +192,7 @@ public class EditServlet extends HttpServlet {
                 }
 
                 html.append("            <div class=\"form-actions\">\n" +
-                        "                <button type=\"submit\" class=\"button button-save\">Save</button>\n" +
-                        "                <button type=\"button\" class=\"button button-cancel\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Cancel</button>\n" +
+                        "                <button type=\"button\" class=\"button button-cancel\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>\n" +
                         "            </div>\n");
 
 
@@ -179,34 +204,7 @@ public class EditServlet extends HttpServlet {
                 writer.println(html);
             }
         } catch (Exception exception) {
-            logger.error("Error displaying edit question page.", exception);
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
-            dispatcher.forward(req, resp);
-        }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            String questionName = req.getParameter("question");
-            HttpSession session = req.getSession(false);
-            String questionId = (String) session.getAttribute("questionId");
-
-            QuestionsDAO questionsDAO = new QuestionsDAO();
-            Question question = questionsDAO.getQuestionById(questionId);
-            question.setName(questionName);
-            List<Answer> answers = question.getAnswers();
-            for (int i = 1; i <= answers.size(); i++) {
-                Answer answer = answers.get(i - 1);
-                String answerName = req.getParameter("answer-" + answer.getId());
-                boolean isCorrect = Boolean.parseBoolean(req.getParameter("isCorrect-" + answer.getId()));
-                answer.setName(answerName);
-                answer.setIsCorrect(isCorrect);
-            }
-            questionsDAO.editQuestion(question);
-            resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
-        } catch (Exception exception) {
-            logger.error("Error editing the question.", exception);
+            LOGGER.error("Error displaying view question page.", exception);
             RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
             dispatcher.forward(req, resp);
         }

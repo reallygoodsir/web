@@ -4,9 +4,10 @@
 
 <web-app>
     <display-name>Servlets Quiz</display-name>
+
     <filter>
         <filter-name>SessionValidationFilter</filter-name>
-        <filter-class>org.servlets.filters.SessionValidationFilter</filter-class>
+        <filter-class>org.servlets.quiz.filters.SessionValidationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>SessionValidationFilter</filter-name>
@@ -19,11 +20,75 @@
 
     <servlet>
         <servlet-name>error-handler-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.ErrorHandlerServlet</servlet-class>
+        <servlet-class>org.servlets.quiz.servlets.ErrorHandlerServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>error-handler-servlet</servlet-name>
         <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>admin-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.AdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>admin-servlet</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>quiz-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.QuizServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>quiz-servlet</servlet-name>
+        <url-pattern>/quiz</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>results-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.ResultsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>results-servlet</servlet-name>
+        <url-pattern>/results</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>show-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.ShowQuestionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>show-questions-servlet</servlet-name>
+        <url-pattern>/questions</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>edit-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.EditQuestionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>edit-questions-servlet</servlet-name>
+        <url-pattern>/questions/edit</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>delete-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.DeleteQuestionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>delete-questions-servlet</servlet-name>
+        <url-pattern>/questions/delete</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>view-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.ViewQuestionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>view-questions-servlet</servlet-name>
+        <url-pattern>/questions/view</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>add-questions-servlet</servlet-name>
+        <servlet-class>org.servlets.quiz.servlets.AddQuestionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>add-questions-servlet</servlet-name>
+        <url-pattern>/questions/add</url-pattern>
     </servlet-mapping>
 
     <error-page>
@@ -35,81 +100,10 @@
         <location>/error</location>
     </error-page>
 
-    <servlet>
-        <servlet-name>admin-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.AdminServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>admin-servlet</servlet-name>
-        <url-pattern>/admin</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>quiz-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.QuizServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>quiz-servlet</servlet-name>
-        <url-pattern>/quiz</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>results-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.ResultsServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>results-servlet</servlet-name>
-        <url-pattern>/results</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>show-questions-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.ShowQuestionsServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>show-questions-servlet</servlet-name>
-        <url-pattern>/questions</url-pattern>
-    </servlet-mapping>
-
-
-    <servlet>
-        <servlet-name>edit-questions-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.EditServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>edit-questions-servlet</servlet-name>
-        <url-pattern>/questions/edit</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>delete-questions-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.DeleteServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>delete-questions-servlet</servlet-name>
-        <url-pattern>/questions/delete</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>view-questions-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.ViewServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>view-questions-servlet</servlet-name>
-        <url-pattern>/questions/view</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>add-questions-servlet</servlet-name>
-        <servlet-class>org.servlets.servlets.AddServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>add-questions-servlet</servlet-name>
-        <url-pattern>/questions/add</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
     <welcome-file-list>
         <welcome-file>quiz</welcome-file>
     </welcome-file-list>

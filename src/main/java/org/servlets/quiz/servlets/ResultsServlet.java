@@ -1,4 +1,4 @@
-package org.servlets.servlets;
+package org.servlets.quiz.servlets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

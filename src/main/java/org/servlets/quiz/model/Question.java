@@ -1,4 +1,4 @@
-package org.servlets.model;
+package org.servlets.quiz.model;
 
 import java.util.List;
 
@@ -10,19 +10,9 @@ public class Question {
     public Question() {
     }
 
-    public Question(String name) {
-        this.name = name;
-    }
-
     public Question(String id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public Question(String id, String name, List<Answer> answers) {
-        this.id = id;
-        this.name = name;
-        this.answers = answers;
     }
 
     public String getId() {

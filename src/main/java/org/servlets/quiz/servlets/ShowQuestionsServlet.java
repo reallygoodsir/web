@@ -1,9 +1,9 @@
-package org.servlets.servlets;
+package org.servlets.quiz.servlets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.servlets.dao.QuestionsDAO;
-import org.servlets.model.Question;
+import org.servlets.quiz.dao.QuestionsDAO;
+import org.servlets.quiz.model.Question;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,12 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowQuestionsServlet extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(ShowQuestionsServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(ShowQuestionsServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -30,20 +29,14 @@ public class ShowQuestionsServlet extends HttpServlet {
             int nextPage = currentPage + 1;
             int previousPage = currentPage - 1;
 
-            int beginning = 0; // change that name
+            int beginning = 0;
             for (int i = 1; i < currentPage; i++) {
-                beginning += 8; // 8 questions a page
+                beginning += 8;
             }
             QuestionsDAO questionsDAO = new QuestionsDAO();
             List<Question> questions = new ArrayList<>();
-            List<Question> temporaryQuestions;
-            try {
-                temporaryQuestions = questionsDAO.getQuestions();
-            } catch (SQLException e) {
-                logger.error("Error occurred getting questions from db.", e);
-                throw new RuntimeException(e);
-            }
-            if (temporaryQuestions.isEmpty()) {
+            List<Question> temporaryQuestions = questionsDAO.getQuestions();
+            if (temporaryQuestions == null || temporaryQuestions.isEmpty()) {
                 PrintWriter writer = resp.getWriter();
                 writer.println("<!DOCTYPE html>\n" +
                         "<html lang=\"en\">\n" +
@@ -150,7 +143,7 @@ public class ShowQuestionsServlet extends HttpServlet {
                     }
                     questions.add(question);
                 }
-                if (questions.size() == 0) {
+                if (questions.isEmpty()) {
                     resp.sendRedirect("http://localhost:8080/servlets-quiz/questions?page=" + previousPage);
                 }
                 StringBuilder html = new StringBuilder();
@@ -284,7 +277,7 @@ public class ShowQuestionsServlet extends HttpServlet {
                 writer.println(html);
             }
         } catch (Exception exception) {
-            logger.error("Error displaying the questions.", exception);
+            LOGGER.error("Error displaying the questions.", exception);
             RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
             dispatcher.forward(req, resp);
         }

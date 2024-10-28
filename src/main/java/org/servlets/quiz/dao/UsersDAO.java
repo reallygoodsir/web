@@ -1,4 +1,4 @@
-package org.servlets.dao;
+package org.servlets.quiz.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 import java.sql.*;
 
 public class UsersDAO extends BaseDAO {
-    private static final Logger logger = LogManager.getLogger(UsersDAO.class);
-    private static final String VERIFICATION = "select * from users where name=? and password=?";
+    private static final Logger LOGGER = LogManager.getLogger(UsersDAO.class);
+    private static final String VERIFICATION = "select * from users where name = ? and password = ?";
 
     public boolean validate(String name, String pass) throws SQLException {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
@@ -19,7 +19,7 @@ public class UsersDAO extends BaseDAO {
 
             return resultSet.next();
         } catch (SQLException exception) {
-            logger.error("Error validating user name {}", name, exception);
+            LOGGER.error("Error validating user name {}", name, exception);
             throw exception;
         }
     }

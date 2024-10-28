@@ -1,10 +1,10 @@
-package org.servlets.servlets;
+package org.servlets.quiz.servlets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.servlets.dao.QuestionsDAO;
-import org.servlets.model.Answer;
-import org.servlets.model.Question;
+import org.servlets.quiz.dao.QuestionsDAO;
+import org.servlets.quiz.model.Answer;
+import org.servlets.quiz.model.Question;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;

@@ -1,8 +1,8 @@
-package org.servlets.servlets;
+package org.servlets.quiz.servlets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.servlets.dao.QuestionsDAO;
+import org.servlets.quiz.dao.QuestionsDAO;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class DeleteServlet extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(DeleteServlet.class);
+public class DeleteQuestionServlet extends HttpServlet {
+    private static final Logger LOGGER = LogManager.getLogger(DeleteQuestionServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,7 +31,7 @@ public class DeleteServlet extends HttpServlet {
                 resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
             }
         } catch (Exception exception) {
-            logger.error("Error deleting the question.", exception);
+            LOGGER.error("Error deleting the question.", exception);
             RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
             dispatcher.forward(req, resp);
         }

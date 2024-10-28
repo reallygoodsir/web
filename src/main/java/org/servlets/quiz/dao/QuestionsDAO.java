@@ -1,7 +1,7 @@
-package org.servlets.dao;
+package org.servlets.quiz.dao;
 
-import org.servlets.model.Answer;
-import org.servlets.model.Question;
+import org.servlets.quiz.model.Answer;
+import org.servlets.quiz.model.Question;
 
 import java.sql.*;
 import java.util.*;
@@ -10,65 +10,60 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class QuestionsDAO extends BaseDAO {
-    private static final Logger logger = LogManager.getLogger(QuestionsDAO.class);
+    private static final Logger LOGGER = LogManager.getLogger(QuestionsDAO.class);
     private static final String INSERT_ANSWER = "INSERT INTO answers (id, name, is_correct, question_id) VALUES (?, ?, ?, ?)";
     private static final String INSERT_QUESTION = "INSERT INTO questions (id, name) VALUES (?, ?)";
     private static final String DELETE_QUESTION = "DELETE FROM questions WHERE id = ?";
     private static final String EDIT_QUESTION = "UPDATE questions SET name = ? WHERE id = ?";
     private static final String EDIT_ANSWER = "UPDATE answers SET name = ?, is_correct = ? WHERE id = ?";
-    private static final String GET_QUESTIONS_AND_ANSWERS = "SELECT \n" +
-            "    questions.id AS question_id, \n" +
-            "    questions.name AS question_name, \n" +
-            "    answers.id AS answer_id,\n" +
-            "    answers.name AS answer_name, \n" +
-            "    answers.is_correct AS answer_is_correct\n" +
-            "FROM \n" +
-            "    questions\n" +
-            "INNER JOIN \n" +
-            "    answers \n" +
-            "ON \n" +
-            "    questions.id = answers.question_id \n" +
+    private static final String GET_QUESTIONS_AND_ANSWERS = "SELECT " +
+            "    questions.id AS question_id, " +
+            "    questions.name AS question_name, " +
+            "    answers.id AS answer_id, " +
+            "    answers.name AS answer_name, " +
+            "    answers.is_correct AS answer_is_correct " +
+            "FROM " +
+            "    questions " +
+            "INNER JOIN " +
+            "    answers " +
+            "ON " +
+            "    questions.id = answers.question_id " +
             "ORDER BY answers.id";
-    private static final String GET_QUESTION_BY_ID = "SELECT \n" +
-            "  questions.id AS question_id, \n" +
-            "  questions.name AS question_name, \n" +
-            "  answers.id AS answer_id, \n" +
-            "  answers.name AS answer_name, \n" +
-            "  answers.is_correct AS answer_is_correct \n" +
-            "FROM \n" +
-            "  questions \n" +
-            "INNER JOIN answers \n" +
-            "ON questions.id = answers.question_id\n" +
-            "AND questions.id = ?\n" +
+    private static final String GET_QUESTION_BY_ID = "SELECT " +
+            "  questions.id AS question_id, " +
+            "  questions.name AS question_name, " +
+            "  answers.id AS answer_id, " +
+            "  answers.name AS answer_name, " +
+            "  answers.is_correct AS answer_is_correct " +
+            "FROM " +
+            "  questions " +
+            "INNER JOIN answers " +
+            "ON questions.id = answers.question_id " +
+            "AND questions.id = ? " +
             "ORDER BY answers.id";
-
 
     public void saveQuestion(Question question) throws SQLException {
-        logger.info("Start saving question: {}", question);
+        LOGGER.info("Start saving question: {}", question);
 
-        // Try-with-resources for Connection ensures it is closed automatically.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             connection.setAutoCommit(false);
 
-            // Save question to the database.
             try (PreparedStatement statementAddQuestion = connection.prepareStatement(INSERT_QUESTION)) {
                 statementAddQuestion.setString(1, question.getId());
                 statementAddQuestion.setString(2, question.getName());
                 int affectedQuestionRows = statementAddQuestion.executeUpdate();
-                logger.info("Affected question rows: {}", affectedQuestionRows);
+                LOGGER.info("Affected question rows: {}", affectedQuestionRows);
 
                 if (affectedQuestionRows != 1) {
-                    logger.error("Affected question rows expected {} but received {}", 1, affectedQuestionRows);
+                    LOGGER.error("Affected question rows expected {} but received {}", 1, affectedQuestionRows);
                     throw new RuntimeException("Failed to save the question: " + question);
                 }
 
-                // Validate answers before proceeding.
                 if (question.getAnswers() == null || question.getAnswers().isEmpty()) {
-                    logger.error("No answers provided for question id {}", question.getId());
+                    LOGGER.error("No answers provided for question id {}", question.getId());
                     throw new IllegalArgumentException("No answers provided for question " + question.getId());
                 }
 
-                // Save each answer.
                 try (PreparedStatement statementAddAnswers = connection.prepareStatement(INSERT_ANSWER)) {
                     for (Answer answer : question.getAnswers()) {
                         statementAddAnswers.setString(1, answer.getId());
@@ -80,25 +75,24 @@ public class QuestionsDAO extends BaseDAO {
                         if (affectedAnswersRows != 1) {
                             throw new RuntimeException("Failed to save an answer: " + answer);
                         }
-                        logger.info("Successfully saved answer {} with question id {}", answer, question.getId());
+                        LOGGER.info("Successfully saved answer {} with question id {}", answer, question.getId());
                     }
                 }
 
-                // Commit transaction.
                 connection.commit();
-                logger.info("Transaction committed successfully.");
-            } catch (SQLException e) {
+                LOGGER.info("Transaction committed successfully.");
+            } catch (SQLException sqlException) {
                 connection.rollback();
-                logger.error("Transaction rolled back due to error", e);
-                throw e; // Rethrow to indicate failure to the caller.
+                LOGGER.error("Transaction rolled back due to error", sqlException);
+                throw sqlException;
             }
 
-        } catch (SQLException e) {
-            logger.error("Error while saving question", e);
-            throw e; // Propagate exception to the caller for handling.
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error while saving question", sqlException);
+            throw sqlException;
         }
 
-        logger.info("End saving question: {}", question);
+        LOGGER.info("End saving question: {}", question);
     }
 
 
@@ -106,7 +100,6 @@ public class QuestionsDAO extends BaseDAO {
         List<Question> result = new ArrayList<>();
         Map<String, Question> questionMap = new HashMap<>();
 
-        // Try-with-resources for automatic closing of resources.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
              PreparedStatement statementGetQuestions = connection.prepareStatement(GET_QUESTIONS_AND_ANSWERS);
              ResultSet resultSet = statementGetQuestions.executeQuery()) {
@@ -118,7 +111,6 @@ public class QuestionsDAO extends BaseDAO {
                 String answerName = resultSet.getString("answer_name");
                 boolean answerIsCorrect = resultSet.getBoolean("answer_is_correct");
 
-                // Use computeIfAbsent to get or create a new question.
                 Question question = questionMap.computeIfAbsent(questionId, id -> {
                     Question q = new Question();
                     q.setId(id);
@@ -128,7 +120,6 @@ public class QuestionsDAO extends BaseDAO {
                     return q;
                 });
 
-                // Only add an answer if it exists in the resultSet.
                 if (answerId != null) {
                     Answer answer = new Answer();
                     answer.setId(answerId);
@@ -137,9 +128,9 @@ public class QuestionsDAO extends BaseDAO {
                     question.getAnswers().add(answer);
                 }
             }
-        } catch (SQLException e) {
-            logger.error("Error fetching questions", e);
-            throw e; // Rethrow the exception to let the caller handle it.
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error fetching questions", sqlException);
+            throw sqlException;
         }
 
         return result;
@@ -148,7 +139,6 @@ public class QuestionsDAO extends BaseDAO {
     public Question getQuestionById(String id) throws SQLException {
         Question question = null;
 
-        // Try-with-resources for automatic closing of resources.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD);
              PreparedStatement statementGetQuestionById = connection.prepareStatement(GET_QUESTION_BY_ID)) {
 
@@ -163,9 +153,8 @@ public class QuestionsDAO extends BaseDAO {
                         question.setAnswers(new ArrayList<>());
                     }
 
-                    // Create and add the answer to the question.
                     String answerId = resultSet.getString("answer_id");
-                    if (answerId != null) { // Ensure that answerId exists before adding.
+                    if (answerId != null) {
                         Answer answer = new Answer();
                         answer.setId(answerId);
                         answer.setName(resultSet.getString("answer_name"));
@@ -174,52 +163,48 @@ public class QuestionsDAO extends BaseDAO {
                     }
                 }
             }
-        } catch (SQLException e) {
-            logger.error("Error fetching question by id", e);
-            throw e;
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error fetching question by id", sqlException);
+            throw sqlException;
         }
 
         return question;
     }
 
     public void deleteQuestion(String questionId) throws SQLException {
-        // Try-with-resources for automatic closing of resources.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement ps = connection.prepareStatement(DELETE_QUESTION)) {
-                ps.setString(1, questionId);
-                int affectedRows = ps.executeUpdate();
+            try (PreparedStatement deleteQuestionStatement = connection.prepareStatement(DELETE_QUESTION)) {
+                deleteQuestionStatement.setString(1, questionId);
+                int affectedRows = deleteQuestionStatement.executeUpdate();
 
                 if (affectedRows == 0) {
                     throw new SQLException("No question found with ID: " + questionId);
                 }
 
-                logger.info("Deleted {} row(s) for question ID: {}", affectedRows, questionId);
+                LOGGER.info("Deleted {} row(s) for question ID: {}", affectedRows, questionId);
                 connection.commit();
-            } catch (SQLException e) {
+            } catch (SQLException sqlException) {
                 connection.rollback();
-                logger.error("Error deleting question with ID {}", questionId, e);
-                throw e; // Rethrow the exception to notify the caller.
+                LOGGER.error("Error deleting question with ID {}", questionId, sqlException);
+                throw sqlException;
             }
         }
     }
 
     public void editQuestion(Question question) throws SQLException {
-        // Try-with-resources for automatic closing of resources.
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER_NAME, DB_PASSWORD)) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement statementQuestion = connection.prepareStatement(EDIT_QUESTION)) {
-                // Update the question details.
                 statementQuestion.setString(1, question.getName());
                 statementQuestion.setString(2, question.getId());
                 int affectedQuestionRows = statementQuestion.executeUpdate();
 
                 if (affectedQuestionRows == 1) {
-                    logger.info("Updated question {}", question.getId());
+                    LOGGER.info("Updated question {}", question.getId());
 
-                    // Update the answers.
                     List<Answer> answers = question.getAnswers();
                     try (PreparedStatement statementAnswer = connection.prepareStatement(EDIT_ANSWER)) {
                         for (Answer answer : answers) {
@@ -229,7 +214,7 @@ public class QuestionsDAO extends BaseDAO {
                             int affectedAnswersRows = statementAnswer.executeUpdate();
 
                             if (affectedAnswersRows == 1) {
-                                logger.info("Successfully updated answer {}", answer.getId());
+                                LOGGER.info("Successfully updated answer {}", answer.getId());
                             } else {
                                 throw new SQLException("Failed to update answer " + answer.getId());
                             }
@@ -240,11 +225,11 @@ public class QuestionsDAO extends BaseDAO {
                 }
 
                 connection.commit();
-                logger.info("Transaction committed for question {}", question.getId());
-            } catch (SQLException e) {
+                LOGGER.info("Transaction committed for question {}", question.getId());
+            } catch (SQLException sqlException) {
                 connection.rollback();
-                logger.error("Transaction rolled back for question id {}", question.getId(), e);
-                throw e; // Rethrow the exception to notify the caller.
+                LOGGER.error("Transaction rolled back for question id {}", question.getId(), sqlException);
+                throw sqlException;
             }
         }
     }
