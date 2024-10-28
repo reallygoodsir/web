@@ -6,6 +6,8 @@ import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,9 +21,9 @@ public class QuizServlet extends HttpServlet {
     private static final String QUESTION_ANSWER_DELIMITER = ":";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        HttpSession session = req.getSession(true);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            HttpSession session = req.getSession(true);
             if (session.isNew()) {
                 QuestionsDAO questionsDAO = new QuestionsDAO();
                 List<Question> questions = questionsDAO.getQuestions();
@@ -270,59 +272,67 @@ public class QuizServlet extends HttpServlet {
 
             PrintWriter writer = resp.getWriter();
             writer.println(html);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            logger.error("Error displaying quiz question.", exception);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
+            dispatcher.forward(req, resp);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        String userAnswer = req.getParameter("options");
-        logger.info("userAnswer {}", userAnswer);
-        HttpSession session = req.getSession(false);
-        Set<String> correctIds = (Set<String>) session.getAttribute("correctIds");
-        boolean isUserAnswerCorrect = correctIds.contains(userAnswer);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            String userAnswer = req.getParameter("options");
+            logger.info("userAnswer {}", userAnswer);
+            HttpSession session = req.getSession(false);
+            Set<String> correctIds = (Set<String>) session.getAttribute("correctIds");
+            boolean isUserAnswerCorrect = correctIds.contains(userAnswer);
 
-        logger.info("isUserAnswerCorrect {}", isUserAnswerCorrect);
-        if (isUserAnswerCorrect) {
-            session.setAttribute("score", 1);
-            session.setAttribute("userAnswerStatus", "Correct");
-        } else {
-            session.setAttribute("userAnswerStatus", "Incorrect");
-            session.setAttribute("score", 0);
-        }
-        if (!session.isNew()) {
-            Object attribute = session.getAttribute("scoreList");
-            List<Integer> attributeScoreList = (ArrayList<Integer>) attribute;
-            Object attributeCheckedList = session.getAttribute("checkedList");
-            List<Integer> checkedList = (ArrayList<Integer>) attributeCheckedList;
-            Integer score = (Integer) session.getAttribute("score");
-            if (score != null) {
-                Integer currentPage = (Integer) session.getAttribute("currentPage");
-                checkedList.add(currentPage - 1, isUserAnswerCorrect ? 1 : 0);
-
-                logger.info("attributeScoreList size {}", attributeScoreList.size());
-                logger.info("currentPage - 1 {}", (currentPage - 1));
-                try {
-                    logger.info(">>>>>>>>>>>>>> before");
-                    attributeScoreList.set(currentPage - 1, score);
-                    logger.info(">>>>>>>>>>>>>> after");
-                } catch (Exception e) {
-                    logger.error("Ignore >>>>>>>>>>>>>>>>>>>>>>>>>>>> exception {}", e.getMessage());
-                }
-
-                logger.info("Attribute Score List: ");
-                for (Integer i : attributeScoreList) {
-                    logger.info(i);
-                }
-                logger.info("\nChecked List: ");
-                for (Integer s : checkedList) {
-                    logger.info("Checked list Value: " + s);
-                }
+            logger.info("isUserAnswerCorrect {}", isUserAnswerCorrect);
+            if (isUserAnswerCorrect) {
+                session.setAttribute("score", 1);
+                session.setAttribute("userAnswerStatus", "Correct");
+            } else {
+                session.setAttribute("userAnswerStatus", "Incorrect");
+                session.setAttribute("score", 0);
             }
-            session.setAttribute("checkedList", checkedList);
-            session.setAttribute("scoreList", attributeScoreList);
+            if (!session.isNew()) {
+                Object attribute = session.getAttribute("scoreList");
+                List<Integer> attributeScoreList = (ArrayList<Integer>) attribute;
+                Object attributeCheckedList = session.getAttribute("checkedList");
+                List<Integer> checkedList = (ArrayList<Integer>) attributeCheckedList;
+                Integer score = (Integer) session.getAttribute("score");
+                if (score != null) {
+                    Integer currentPage = (Integer) session.getAttribute("currentPage");
+                    checkedList.add(currentPage - 1, isUserAnswerCorrect ? 1 : 0);
+
+                    logger.info("attributeScoreList size {}", attributeScoreList.size());
+                    logger.info("currentPage - 1 {}", (currentPage - 1));
+                    try {
+                        logger.info(">>>>>>>>>>>>>> before");
+                        attributeScoreList.set(currentPage - 1, score);
+                        logger.info(">>>>>>>>>>>>>> after");
+                    } catch (Exception e) {
+                        logger.error("Ignore >>>>>>>>>>>>>>>>>>>>>>>>>>>> exception {}", e.getMessage());
+                    }
+
+                    logger.info("Attribute Score List: ");
+                    for (Integer i : attributeScoreList) {
+                        logger.info(i);
+                    }
+                    logger.info("\nChecked List: ");
+                    for (Integer s : checkedList) {
+                        logger.info("Checked list Value: " + s);
+                    }
+                }
+                session.setAttribute("checkedList", checkedList);
+                session.setAttribute("scoreList", attributeScoreList);
+            }
+            doGet(req, resp);
+        } catch (Exception exception) {
+            logger.error("Error saving user's answer.", exception);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
+            dispatcher.forward(req, resp);
         }
-        doGet(req, resp);
     }
 }

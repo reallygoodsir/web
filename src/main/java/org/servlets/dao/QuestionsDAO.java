@@ -145,7 +145,7 @@ public class QuestionsDAO extends BaseDAO {
         return result;
     }
 
-    public Question getQuestionById(String id) {
+    public Question getQuestionById(String id) throws SQLException {
         Question question = null;
 
         // Try-with-resources for automatic closing of resources.
@@ -174,8 +174,9 @@ public class QuestionsDAO extends BaseDAO {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.error("Error fetching question by id", e);
+            throw e;
         }
 
         return question;

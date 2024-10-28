@@ -18,6 +18,24 @@
     </filter-mapping>
 
     <servlet>
+        <servlet-name>error-handler-servlet</servlet-name>
+        <servlet-class>org.servlets.servlets.ErrorHandlerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>error-handler-servlet</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error</location>
+    </error-page>
+
+    <servlet>
         <servlet-name>admin-servlet</servlet-name>
         <servlet-class>org.servlets.servlets.AdminServlet</servlet-class>
     </servlet>

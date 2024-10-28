@@ -6,6 +6,8 @@ import org.servlets.dao.QuestionsDAO;
 import org.servlets.model.Answer;
 import org.servlets.model.Question;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,187 +20,193 @@ public class ViewServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(ViewServlet.class);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String questionId = req.getParameter("id");
-        HttpSession session = req.getSession(true);
-        session.setAttribute("questionId", questionId);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            String questionId = req.getParameter("id");
+            HttpSession session = req.getSession(true);
+            session.setAttribute("questionId", questionId);
 
-        if (questionId == null) {
-            logger.error("Expected to have question id in session but was not found.");
-            resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
-        } else {
-            QuestionsDAO questionsDAO = new QuestionsDAO();
-            Question question = questionsDAO.getQuestionById(questionId);
+            if (questionId == null) {
+                logger.error("Expected to have question id in session but was not found.");
+                resp.sendRedirect("http://localhost:8080/servlets-quiz/questions");
+            } else {
+                QuestionsDAO questionsDAO = new QuestionsDAO();
+                Question question = questionsDAO.getQuestionById(questionId);
 
-            StringBuilder html = new StringBuilder();
-            html.append("<!DOCTYPE html>\n" +
-                    "<html lang=\"en\">\n" +
-                    "<head>\n" +
-                    "    <meta charset=\"UTF-8\">\n" +
-                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                    "    <title>Edit Question</title>\n" +
-                    "    <style>\n" +
-                    "        body {\n" +
-                    "            font-family: Arial, sans-serif;\n" +
-                    "            background-color: #f4f4f4;\n" +
-                    "            padding: 20px;\n" +
-                    "            box-sizing: border-box;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .container {\n" +
-                    "            background-color: #ffffff;\n" +
-                    "            padding: 20px;\n" +
-                    "            border-radius: 8px;\n" +
-                    "            max-width: 1000px;\n" +
-                    "            margin: 0 auto;\n" +
-                    "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        h2 {\n" +
-                    "            text-align: center;\n" +
-                    "            color: #333;\n" +
-                    "            margin-bottom: 20px;\n" +
-                    "        }\n" +
-                    "\n" +
-                    ".form-group {\n" +
-                            "    width: 100%; /* Make sure the form group takes full width */\n" +
-                            "}\n" +
-                            "\n" +
-                            ".auto-expand {\n" +
-                            "    width: 100%; \n" +
-                            "    padding: 10px; \n" +
-                            "    border: 1px solid #ddd; \n" +
-                            "    border-radius: 5px; \n" +
-                            "    box-sizing: border-box; \n" +
-                            "    resize: vertical; /* Allow vertical resizing */\n" +
-                            "    min-height: 50px; /* Set a minimum height */\n" +
-                            "    overflow: hidden; /* Prevent overflow from showing scrollbars */\n" +
-                            "    line-height: 1.5; /* Set line height for better readability */\n" +
-                            "    font-family: inherit; /* Ensure consistent font with the rest of the form */\n" +
-                            "    font-size: inherit; /* Ensure font size consistency */\n" +
-                            "}\n" +
-                    "\n" +
-                    ".form-group label {\n" +
-                    "    display: block;\n" +
-                    "    font-weight: bold;\n" +
-                    "    margin-bottom: 5px;\n" +
-                    "    color: #333; /* Color for labels */\n" +
-                    "    font-size: 1.1em; /* Make labels slightly larger */\n" +
-                    "}\n" +
-                    "\n" +
-                    ".form-group textarea,\n" +
-                    ".form-group select {\n" +
-                    "    width: 100%; \n" +
-                    "    padding: 10px; \n" +
-                    "    border: 1px solid #ddd; \n" +
-                    "    border-radius: 5px; \n" +
-                    "    box-sizing: border-box; \n" +
-                    "}\n" +
-                    "        .form-group textarea:focus,\n" +
-                    "        .form-group select:focus {\n" +
-                    "            border-color: #007BFF;\n" +
-                    "            outline: none;\n" +
-                    "        }\n" +
-                    "\n" +
-                    ".is-correct-label {\n" +
-                    "            font-weight: bold;\n" +
-                    "            color: #555;\n" +
-                    "            margin-top: 10px;\n" +
-                    "        }\n" +
-                    "\n" +
-                    ".is-correct-select {\n" +
-                    "    width: 100%;\n" +
-                    "    padding: 5px; /* Reduce padding to make the dropdown smaller */\n" +
-                    "    border: 1px solid #ddd;\n" +
-                    "    border-radius: 5px;\n" +
-                    "    box-sizing: border-box;\n" +
-                    "    max-height: 50px;\n" +
-                    "    background-color: #f9f9f9;\n" +
-                    "    color: #333;\n" +
-                    "    font-weight: normal;\n" +
-                    "    line-height: 1.2; /* Decrease line-height to reduce the height of the options */\n" +
-                    "}\n" +
-                    "        .is-correct-select:focus {\n" +
-                    "            border-color: #007BFF;\n" +
-                    "            outline: none;\n" +
-                    "        }\n" +
-                    "        .form-actions {\n" +
-                    "            display: flex;\n" +
-                    "            justify-content: flex-end  ;\n" +
-                    "            margin-top: 20px;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .button {\n" +
-                    "            padding: 10px 15px;\n" +
-                    "            border: none;\n" +
-                    "            border-radius: 5px;\n" +
-                    "            cursor: pointer;\n" +
-                    "            font-size: 16px;\n" +
-                    "            transition: background-color 0.3s;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .button-save {\n" +
-                    "            background-color: #28a745;\n" +
-                    "            color: white;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .button-cancel {\n" +
-                    "            background-color: #dc3545;\n" +
-                    "            color: white;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .button-save:hover {\n" +
-                    "            background-color: #218838;\n" +
-                    "        }\n" +
-                    "\n" +
-                    "        .button-cancel:hover {\n" +
-                    "            background-color: #c82333;\n" +
-                    "        }\n" +
-                    "    </style>\n" +
-                    "</head>\n" +
-                    "<body>\n");
+                StringBuilder html = new StringBuilder();
+                html.append("<!DOCTYPE html>\n" +
+                        "<html lang=\"en\">\n" +
+                        "<head>\n" +
+                        "    <meta charset=\"UTF-8\">\n" +
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                        "    <title>Edit Question</title>\n" +
+                        "    <style>\n" +
+                        "        body {\n" +
+                        "            font-family: Arial, sans-serif;\n" +
+                        "            background-color: #f4f4f4;\n" +
+                        "            padding: 20px;\n" +
+                        "            box-sizing: border-box;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .container {\n" +
+                        "            background-color: #ffffff;\n" +
+                        "            padding: 20px;\n" +
+                        "            border-radius: 8px;\n" +
+                        "            max-width: 1000px;\n" +
+                        "            margin: 0 auto;\n" +
+                        "            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        h2 {\n" +
+                        "            text-align: center;\n" +
+                        "            color: #333;\n" +
+                        "            margin-bottom: 20px;\n" +
+                        "        }\n" +
+                        "\n" +
+                        ".form-group {\n" +
+                        "    width: 100%; /* Make sure the form group takes full width */\n" +
+                        "}\n" +
+                        "\n" +
+                        ".auto-expand {\n" +
+                        "    width: 100%; \n" +
+                        "    padding: 10px; \n" +
+                        "    border: 1px solid #ddd; \n" +
+                        "    border-radius: 5px; \n" +
+                        "    box-sizing: border-box; \n" +
+                        "    resize: vertical; /* Allow vertical resizing */\n" +
+                        "    min-height: 50px; /* Set a minimum height */\n" +
+                        "    overflow: hidden; /* Prevent overflow from showing scrollbars */\n" +
+                        "    line-height: 1.5; /* Set line height for better readability */\n" +
+                        "    font-family: inherit; /* Ensure consistent font with the rest of the form */\n" +
+                        "    font-size: inherit; /* Ensure font size consistency */\n" +
+                        "}\n" +
+                        "\n" +
+                        ".form-group label {\n" +
+                        "    display: block;\n" +
+                        "    font-weight: bold;\n" +
+                        "    margin-bottom: 5px;\n" +
+                        "    color: #333; /* Color for labels */\n" +
+                        "    font-size: 1.1em; /* Make labels slightly larger */\n" +
+                        "}\n" +
+                        "\n" +
+                        ".form-group textarea,\n" +
+                        ".form-group select {\n" +
+                        "    width: 100%; \n" +
+                        "    padding: 10px; \n" +
+                        "    border: 1px solid #ddd; \n" +
+                        "    border-radius: 5px; \n" +
+                        "    box-sizing: border-box; \n" +
+                        "}\n" +
+                        "        .form-group textarea:focus,\n" +
+                        "        .form-group select:focus {\n" +
+                        "            border-color: #007BFF;\n" +
+                        "            outline: none;\n" +
+                        "        }\n" +
+                        "\n" +
+                        ".is-correct-label {\n" +
+                        "            font-weight: bold;\n" +
+                        "            color: #555;\n" +
+                        "            margin-top: 10px;\n" +
+                        "        }\n" +
+                        "\n" +
+                        ".is-correct-select {\n" +
+                        "    width: 100%;\n" +
+                        "    padding: 5px; /* Reduce padding to make the dropdown smaller */\n" +
+                        "    border: 1px solid #ddd;\n" +
+                        "    border-radius: 5px;\n" +
+                        "    box-sizing: border-box;\n" +
+                        "    max-height: 50px;\n" +
+                        "    background-color: #f9f9f9;\n" +
+                        "    color: #333;\n" +
+                        "    font-weight: normal;\n" +
+                        "    line-height: 1.2; /* Decrease line-height to reduce the height of the options */\n" +
+                        "}\n" +
+                        "        .is-correct-select:focus {\n" +
+                        "            border-color: #007BFF;\n" +
+                        "            outline: none;\n" +
+                        "        }\n" +
+                        "        .form-actions {\n" +
+                        "            display: flex;\n" +
+                        "            justify-content: flex-end  ;\n" +
+                        "            margin-top: 20px;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .button {\n" +
+                        "            padding: 10px 15px;\n" +
+                        "            border: none;\n" +
+                        "            border-radius: 5px;\n" +
+                        "            cursor: pointer;\n" +
+                        "            font-size: 16px;\n" +
+                        "            transition: background-color 0.3s;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .button-save {\n" +
+                        "            background-color: #28a745;\n" +
+                        "            color: white;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .button-cancel {\n" +
+                        "            background-color: #dc3545;\n" +
+                        "            color: white;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .button-save:hover {\n" +
+                        "            background-color: #218838;\n" +
+                        "        }\n" +
+                        "\n" +
+                        "        .button-cancel:hover {\n" +
+                        "            background-color: #c82333;\n" +
+                        "        }\n" +
+                        "    </style>\n" +
+                        "</head>\n" +
+                        "<body>\n");
 
-            html.append("    <div class=\"container\">\n" +
-                    "        <h2>View Question</h2>\n" +
-                    "        <form action=\"\" method=\"POST\">\n" +
-                    "            <div class=\"form-group\">\n" +
-                    "                <label for=\"question\">Question:</label>\n" +
-                    "                <textarea id=\"question\" name=\"question\" disabled>" + question.getName() + "</textarea>\n" +
-                    "            </div>\n" +
-                    "\n");
-            List<Answer> answers = question.getAnswers();
-            for (int i = 0; i < answers.size(); i++) {
-                Answer answer = answers.get(i);
-                boolean isCorrect = answer.getIsCorrect();
-                int answerIndex = i + 1;
-                html.append("            <div class=\"form-group\">\n" +
-                        "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
-                        "                <textarea rows=\"8\" id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
-                        "                <label class=\"is-correct-label\" for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
-                        "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" class=\"is-correct-select\" disabled>\n");
-                if (isCorrect) {
-                    html.append("                    <option value=\"true\" selected>True</option>\n");
-                    html.append("                    <option value=\"false\">False</option>\n");
-                } else {
-                    html.append("                    <option value=\"true\">True</option>\n");
-                    html.append("                    <option value=\"false\" selected>False</option>\n");
-                }
-                html.append("                </select>\n" +
+                html.append("    <div class=\"container\">\n" +
+                        "        <h2>View Question</h2>\n" +
+                        "        <form action=\"\" method=\"POST\">\n" +
+                        "            <div class=\"form-group\">\n" +
+                        "                <label for=\"question\">Question:</label>\n" +
+                        "                <textarea id=\"question\" name=\"question\" disabled>" + question.getName() + "</textarea>\n" +
                         "            </div>\n" +
                         "\n");
+                List<Answer> answers = question.getAnswers();
+                for (int i = 0; i < answers.size(); i++) {
+                    Answer answer = answers.get(i);
+                    boolean isCorrect = answer.getIsCorrect();
+                    int answerIndex = i + 1;
+                    html.append("            <div class=\"form-group\">\n" +
+                            "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
+                            "                <textarea rows=\"8\" id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
+                            "                <label class=\"is-correct-label\" for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
+                            "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" class=\"is-correct-select\" disabled>\n");
+                    if (isCorrect) {
+                        html.append("                    <option value=\"true\" selected>True</option>\n");
+                        html.append("                    <option value=\"false\">False</option>\n");
+                    } else {
+                        html.append("                    <option value=\"true\">True</option>\n");
+                        html.append("                    <option value=\"false\" selected>False</option>\n");
+                    }
+                    html.append("                </select>\n" +
+                            "            </div>\n" +
+                            "\n");
+                }
+
+                html.append("            <div class=\"form-actions\">\n" +
+                        "                <button type=\"button\" class=\"button button-cancel\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>\n" +
+                        "            </div>\n");
+
+
+                html.append("        </form>\n" +
+                        "    </div>\n" +
+                        "</body>\n" +
+                        "</html>\n");
+                PrintWriter writer = resp.getWriter();
+                writer.println(html);
             }
-
-            html.append("            <div class=\"form-actions\">\n" +
-                    "                <button type=\"button\" class=\"button button-cancel\" onclick=\"window.location.href='http://localhost:8080/servlets-quiz/questions'\">Return</button>\n" +
-                    "            </div>\n");
-
-
-            html.append("        </form>\n" +
-                    "    </div>\n" +
-                    "</body>\n" +
-                    "</html>\n");
-            PrintWriter writer = resp.getWriter();
-            writer.println(html);
+        } catch (Exception exception) {
+            logger.error("Error displaying view question page.", exception);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/error");
+            dispatcher.forward(req, resp);
         }
     }
 }
