@@ -25,6 +25,12 @@ public class ResultsServlet extends HttpServlet {
         } else {
             Object attribute = session.getAttribute("scoreList");
             List<Integer> attributeScoreList = (ArrayList<Integer>) attribute;
+            for(int i = 0; i < attributeScoreList.size(); i++){
+                Integer integer = attributeScoreList.get(i);
+                if(integer <= -1){
+                    attributeScoreList.set(i, 0);
+                }
+            }
             Integer finalScore = 0;
             for (Integer i : attributeScoreList) {
                 finalScore += i;
