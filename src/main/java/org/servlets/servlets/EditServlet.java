@@ -148,7 +148,7 @@ public class EditServlet extends HttpServlet {
                 int answerIndex = i + 1;
                 html.append("            <div class=\"form-group\">\n" +
                         "                <label for=\"answer-" + answer.getId() + "\">Answer " + answerIndex + ":</label>\n" +
-                        "                <textarea id=\"answer-" + answer.getId() + "\" name=\"answer-" + answer.getId() + "\" required>" + answer.getName() + "</textarea>\n" +
+                        "                <textarea rows=\"8\" id=\"answer-" + answer.getId() + "\" name=\"answer-" + answer.getId() + "\" required>" + answer.getName() + "</textarea>\n" +
                         "                <label for=\"isCorrect-" + answer.getId() + "\">Is Correct:</label>\n" +
                         "                <select id=\"isCorrect-" + answer.getId() + "\" name=\"isCorrect-" + answer.getId() + "\" required>\n");
                 if (isCorrect) {

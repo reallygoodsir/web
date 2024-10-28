@@ -103,10 +103,13 @@ public class QuizServlet extends HttpServlet {
                     "        .form-container {\n" +
                     "            background: #fff;\n" +
                     "            padding: 20px 30px;\n" +
-                    "            border-radius: 10px;\n" +
+                    "            box-sizing: border-box;\n" +
                     "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n" +
                     "            width: 100%;\n" +
-                    "            max-width: 400px;\n" +
+                    "            max-width: 1000px;\n" +
+                    "            height: 100vh;\n" +
+                    "            overflow-y: auto; /* Allow scrolling if content overflows */\n" +
+                    "            max-height: 100vh; /* Limit height */\n" +
                     "        }\n");
             if ("Correct".equalsIgnoreCase(userAnswer) || userScore == 1) {
                 html.append(".form-container .static-label {\n" +

@@ -135,7 +135,7 @@ public class AddServlet extends HttpServlet {
         for (int i = 1; i <= ANSWERS_COUNT; i++) {
             html.append("        <div class=\"form-group\">\n" +
                     "                <label for=\"answer" + i + "\">Answer " + i + ":</label>\n" +
-                    "                <textarea id=\"answer" + i + "\" name=\"answer" + i + "\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
+                    "                <textarea rows=\"8\" id=\"answer" + i + "\" name=\"answer" + i + "\" placeholder=\"Enter text for Answer ...\" required></textarea>\n" +
                     "                <label for=\"isTrue" + i + "\">Is Correct:</label>\n" +
                     "                <select id=\"isTrue" + i + "\" name=\"isTrue" + i + "\" required>\n" +
                     "                    <option value=\"true\" selected>True</option>\n" +

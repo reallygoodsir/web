@@ -173,7 +173,7 @@ public class ViewServlet extends HttpServlet {
                 int answerIndex = i + 1;
                 html.append("            <div class=\"form-group\">\n" +
                         "                <label for=\"answer" + answerIndex + "\">Answer " + answerIndex + ":</label>\n" +
-                        "                <textarea id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
+                        "                <textarea rows=\"8\" id=\"answer" + answerIndex + "\" name=\"answer" + answerIndex + "\" class=\"auto-expand\" disabled>" + answer.getName() + "</textarea>\n" +
                         "                <label class=\"is-correct-label\" for=\"isCorrect" + answerIndex + "\">Is Correct:</label>\n" +
                         "                <select id=\"isCorrect" + answerIndex + "\" name=\"isCorrect" + answerIndex + "\" class=\"is-correct-select\" disabled>\n");
                 if (isCorrect) {
