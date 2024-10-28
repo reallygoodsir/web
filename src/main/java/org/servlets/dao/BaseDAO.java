@@ -1,7 +1,7 @@
 package org.servlets.dao;
 
 public abstract class BaseDAO {
-    protected final static String DB_URL = "jdbc:mysql://localhost/servlets-db";
-    protected final static String DB_USER_NAME = "root";
-    protected final static String DB_PASSWORD = "root";
+    protected final static String DB_URL = System.getenv("SERVLETS_DB_URL");
+    protected final static String DB_USER_NAME = System.getenv("SERVLETS_DB_USER_NAME");
+    protected final static String DB_PASSWORD = System.getenv("SERVLETS_DB_PASSWORD");
 }
