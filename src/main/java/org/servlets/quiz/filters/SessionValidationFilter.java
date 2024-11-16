@@ -25,7 +25,7 @@ public class SessionValidationFilter implements Filter {
             HttpSession session = request.getSession(false);
             if (session == null) {
                 LOGGER.info("No session. Before redirect to admin page");
-                ((HttpServletResponse) servletResponse).sendRedirect("http://localhost:8080/servlets-quiz/admin");
+                ((HttpServletResponse) servletResponse).sendRedirect("http://localhost:8080/servlets-quiz/admin.jsp");
                 LOGGER.info("No session. After redirect to admin page");
             } else {
                 LOGGER.info("Before filter chain");

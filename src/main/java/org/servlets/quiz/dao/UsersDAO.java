@@ -16,7 +16,6 @@ public class UsersDAO extends BaseDAO {
             preparedStatement.setString(2, pass);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-
             return resultSet.next();
         } catch (SQLException exception) {
             LOGGER.error("Error validating user name {}", name, exception);
